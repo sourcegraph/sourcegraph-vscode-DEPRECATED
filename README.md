@@ -45,14 +45,15 @@ To develop the extension:
 - `git clone` the repository somewhere and open it with `code .`.
 - Press <kbd>F5</kbd> to open a new VS Code window with the extension loaded.
 - After making changes to `src/extension.ts`, reload the window by clicking the reload icon in the debug toolbar or with <kbd>F5</kbd>.
-- To release a new version, you MUST update the following files:
-  1. `README.md` (describe ALL changes)
-  2. `CHANGELOG.md` (copy rom README.md change above)
-  3. `src/extension.ts` (`VERSION` constant)
-  - Then `git commit -m "all: release v<THE VERSION>` and `git push` and `git tag v<THE VERSION>` and `git push --tags`.
-  - Next, publish on the VS Code store by following https://code.visualstudio.com/docs/extensions/publish-extension (contact @slimsag or @lindaxie for access)
-  - `sourcegraph` is the publisher, so use `vsce login sourcegraph` and https://marketplace.visualstudio.com/manage/publishers/sourcegraph
-  - `cd sourcegraph-vscode` and `vsce publish <patch|minor|major>`
+- To release a new version:
+  1. Update `README.md` (describe ALL changes)
+  2. Update `CHANGELOG.md` (copy from README.md change above)
+  3. Update `src/extension.ts` (`VERSION` constant)
+  4. Publish on the VS Code store by following https://code.visualstudio.com/docs/extensions/publish-extension (contact @slimsag or @lindaxie for access)
+    - `vsce login sourcegraph` (see also https://marketplace.visualstudio.com/manage/publishers/sourcegraph)
+    - `cd sourcegraph-vscode` and `vsce publish <major|minor|patch>`
+  7. `git add . && git commit -m "all: release v<THE VERSION>" && git push`
+  8. `git tag v<THE VERSION> && git push --tags`
 
 
 ## Version History
