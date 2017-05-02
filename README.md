@@ -4,7 +4,7 @@ The Sourcegraph extension for VS Code enables you to quickly open and search cod
 
 ## Installation
 
-1. Open the extensions tab on the left side of VS Code.
+1. Open the extensions tab on the left side of VS Code (<kbd>Cmd+Shift+X</kbd> or <kbd>Ctrl+Shift+X</kbd>).
 2. Search for `Sourcegraph` -> `Install` and `Reload`.
 
 
@@ -34,7 +34,7 @@ Please file an issue: https://github.com/sourcegraph/sourcegraph-sublime/issues/
 
 ## Uninstallation
 
-1. Open the extensions tab on the left side of VS Code.
+1. Open the extensions tab on the left side of VS Code (<kbd>Cmd+Shift+X</kbd> or <kbd>Ctrl+Shift+X</kbd>).
 2. Search for `Sourcegraph` -> Gear icon -> `Uninstall` and `Reload`.
 
 
