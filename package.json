@@ -1,80 +1,80 @@
 {
-  "name": "sourcegraph",
-  "displayName": "Sourcegraph",
-  "description": "Sourcegraph for VS Code",
-  "version": "1.0.0",
-  "publisher": "sourcegraph",
-  "license": "MIT",
-  "icon": "images/logo.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sourcegraph/sourcegraph-vscode.git"
-  },
-  "engines": {
-    "vscode": "^1.11.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:extension.open",
-    "onCommand:extension.search"
-  ],
-  "main": "./out/src/extension",
-  "contributes": {
-    "commands": [
-      {
-        "command": "extension.open",
-        "title": "Sourcegraph: Open"
-      },
-      {
-        "command": "extension.search",
-        "title": "Sourcegraph: Search"
-      }
+    "name": "sourcegraph",
+    "displayName": "Sourcegraph",
+    "description": "Sourcegraph for VS Code",
+    "version": "1.0.1",
+    "publisher": "sourcegraph",
+    "license": "MIT",
+    "icon": "images/logo.png",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sourcegraph/sourcegraph-vscode.git"
+    },
+    "engines": {
+        "vscode": "^1.11.0"
+    },
+    "categories": [
+        "Other"
     ],
-    "keybindings": [
-      {
-        "command": "extension.open",
-        "key": "alt+a",
-        "mac": "alt+a",
-        "when": "editorFocus"
-      },
-      {
-        "command": "extension.search",
-        "key": "alt+s",
-        "mac": "alt+s",
-        "when": "editorFocus"
-      }
+    "activationEvents": [
+        "onCommand:extension.open",
+        "onCommand:extension.search"
     ],
-    "configuration": {
-      "type": "object",
-      "title": "Sourcegraph extension configuration",
-      "properties": {
-        "sourcegraph.URL": {
-          "type": [
-            "string"
-          ],
-          "default": "https://sourcegraph.com",
-          "description": "The Sourcegraph instance to use. Specify your on-premises Sourcegraph instance here, if applicable."
+    "main": "./out/src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.open",
+                "title": "Sourcegraph: Open"
+            },
+            {
+                "command": "extension.search",
+                "title": "Sourcegraph: Search"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "extension.open",
+                "key": "alt+a",
+                "mac": "alt+a",
+                "when": "editorFocus"
+            },
+            {
+                "command": "extension.search",
+                "key": "alt+s",
+                "mac": "alt+s",
+                "when": "editorFocus"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Sourcegraph extension configuration",
+            "properties": {
+                "sourcegraph.URL": {
+                    "type": [
+                        "string"
+                    ],
+                    "default": "https://sourcegraph.com",
+                    "description": "The Sourcegraph instance to use. Specify your on-premises Sourcegraph instance here, if applicable."
+                }
+            }
         }
-      }
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "execa": "^0.6.3",
+        "opn": "^5.0.0"
     }
-  },
-  "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test"
-  },
-  "devDependencies": {
-    "typescript": "^2.0.3",
-    "vscode": "^1.0.0",
-    "mocha": "^2.3.3",
-    "@types/node": "^6.0.40",
-    "@types/mocha": "^2.2.32"
-  },
-  "dependencies": {
-    "execa": "^0.6.3",
-    "opn": "^5.0.0"
-  }
 }
