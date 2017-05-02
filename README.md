@@ -1,4 +1,4 @@
-# Sourcegraph for VS Code
+# Sourcegraph for VS Code [![visual_studio_code](https://rawgit.com/aleen42/badges/master/src/visual_studio_code.svg)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph)
 
 The Sourcegraph extension for VS Code enables you to quickly open and search code on Sourcegraph.com easily and efficiently.
 
