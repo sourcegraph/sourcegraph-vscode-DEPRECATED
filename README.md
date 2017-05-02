@@ -52,7 +52,7 @@ To develop the extension:
   - Then `git commit -m "all: release v<THE VERSION>` and `git push` and `git tag v<THE VERSION>` and `git push --tags`.
   - Next, publish on the VS Code store by following https://code.visualstudio.com/docs/extensions/publish-extension (contact @slimsag or @lindaxie for access)
   - `sourcegraph` is the publisher, so use `vsce login sourcegraph` and https://marketplace.visualstudio.com/manage/publishers/sourcegraph
-  - `cd sourcegraph-vscode` and `vsce publish`
+  - `cd sourcegraph-vscode` and `vsce publish <patch|minor|major>`
 
 
 ## Version History
