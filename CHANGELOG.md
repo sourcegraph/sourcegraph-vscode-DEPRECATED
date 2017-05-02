@@ -1,7 +1,7 @@
 # Change Log
-All notable changes to the "sourcegraph" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+All changes to the Sourcegraph VS Code extension are documented in this file.
 
-## [Unreleased]
-- Initial release
+### 1.0.0
+
+Initial release; basic Open File & Search functionality.
