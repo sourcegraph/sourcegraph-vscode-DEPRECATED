@@ -29,7 +29,7 @@ This extension contributes the following settings:
 
 ## Questions & Feedback
 
-Please file an issue: https://github.com/sourcegraph/sourcegraph-sublime/issues/new
+Please file an issue: https://github.com/sourcegraph/sourcegraph-vscode/issues/new
 
 
 ## Uninstallation
