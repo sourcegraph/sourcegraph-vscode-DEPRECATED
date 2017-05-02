@@ -50,6 +50,9 @@ To develop the extension:
   2. `CHANGELOG.md` (copy rom README.md change above)
   3. `src/extension.ts` (`VERSION` constant)
   - Then `git commit -m "all: release v<THE VERSION>` and `git push` and `git tag v<THE VERSION>` and `git push --tags`.
+  - Next, publish on the VS Code store by following https://code.visualstudio.com/docs/extensions/publish-extension (contact @slimsag or @lindaxie for access)
+  - `sourcegraph` is the publisher, so use `vsce login sourcegraph` and https://marketplace.visualstudio.com/manage/publishers/sourcegraph
+  - `cd sourcegraph-vscode` and `vsce publish`
 
 
 ## Version History
