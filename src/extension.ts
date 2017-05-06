@@ -6,7 +6,7 @@ const execa = require('execa');
 const url = require('url');
 const path = require('path');
 
-const VERSION = "v1.0.3"
+const VERSION = "v1.0.4"
 
 // gitRemotes returns the names of all git remotes, e.g. ["origin", "foobar"]
 async function gitRemotes(repoDir: string) {
@@ -51,76 +51,12 @@ async function gitBranch(repoDir: string) {
     });
 }
 
-// removePrefixes removes any of the given prefixes from the input string `s`.
-// Only one prefix is removed.
-function removePrefixes(s: string, prefixes: string[]) {
-    prefixes.every((prefix) => {
-        if (s.startsWith(prefix)) {
-            s = s.slice(prefix.length)
-            return false
-        }
-        return true
-    })
-    return s
-}
-
-// replaceLastOccurrence returns `s` with the last occurrence of `a` replaced by
-// `b`.
-function replaceLastOccurrence(s: string, a: string, b: string) {
-    const k = s.lastIndexOf(a)
-    if (k === -1) { return s }
-    return s.slice(0, k) + b + s.slice(k + 1)
-}
-
-// repoFromRemoteURL returns the repository name from the remote URL. An
-// exception is raised if it cannot be determined. Supported formats are:
-//
-// 	optional("ssh://" OR "git://" OR "https://" OR "https://")
-// 	+ optional("username") + optional(":password") + optional("@")
-// 	+ "github.com"
-// 	+ "/" OR ":"
-// 	+ "<organization>" + "/" + "<username>"
-//
-function repoFromRemoteURL(remoteURL: string) {
-    // Normalize all URL schemes into "http://" just for parsing purposes. We
-    // don't actually care about the scheme itself.
-    let r = removePrefixes(remoteURL, ["ssh://", "git://", "https://", "http://"])
-
-    // Normalize github.com:foo/bar -> github.com/foo/bar -- Note we only do the
-    // last occurrence as it may be included earlier in the case of 'foo:bar@github.com'
-    r = replaceLastOccurrence(r, ":", "/")
-
-    const u = url.parse("http://" + r)
-    if (!u.host.endsWith("github.com")) { // Note: using endswith because netloc may have 'username:password@' prefix.
-        throw new Error("repository remote is not github.com: " + remoteURL)
-    }
-    return "github.com" + u.path
-}
-
 function sourcegraphURL() {
     const url = vscode.workspace.getConfiguration("sourcegraph").get<string>("URL");
     if (!url.endsWith("/")) {
         return url + "/";
     }
     return url
-}
-
-function lineHash(s: vscode.Selection) {
-    if (s.isEmpty) {
-        return `L${s.start.line + 1}:${s.start.character + 1}`
-    }
-    return `L${s.start.line + 1}:${s.start.character + 1}-${s.end.line + 1}:${s.end.character + 1}`
-}
-
-function branchStr(branch: string) {
-    if (branch === "HEAD") {
-        return "" // Detached head state
-    }
-    if (branch === "master") {
-        // Assume master is the default branch, for now.
-        return ""
-    }
-    return "@" + branch
 }
 
 // repoInfo returns the Sourcegraph repository URI, and the file path relative
@@ -133,9 +69,9 @@ async function repoInfo(fileName: string) {
 
     // Determine file path, relative to repository root.
     const fileRel = fileName.slice(repoRoot.length + 1)
-    const repo = repoFromRemoteURL(await gitDefaultRemoteURL(repoRoot))
+    const remoteURL = await gitDefaultRemoteURL(repoRoot)
     const branch = await gitBranch(repoRoot)
-    return [repo, branch, fileRel]
+    return [remoteURL, branch, fileRel]
 }
 
 // showError displays an error message to the user.
@@ -148,10 +84,19 @@ function showError(err: Error): void {
 async function openCommand(editor: vscode.TextEditor) {
     editor = vscode.window.activeTextEditor;
     try {
-        const [repo, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
+        const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
 
         // Open in browser.
-        opn(`${sourcegraphURL()}${repo}${branchStr(branch)}/-/blob/${fileRel}?utm_source=VSCode-${VERSION}#${lineHash(editor.selection)}`)
+        opn(`${sourcegraphURL()}-/editor`
+        + `?remote_url=${encodeURIComponent(remoteURL)}`
+        + `&branch=${encodeURIComponent(branch)}`
+        + `&file=${encodeURIComponent(fileRel)}`
+        + `&editor=${encodeURIComponent("VSCode")}`
+        + `&version=${encodeURIComponent(VERSION)}`
+        + `&start_row=${encodeURIComponent(String(editor.selection.start.line))}`
+        + `&start_col=${encodeURIComponent(String(editor.selection.start.character))}`
+        + `&end_row=${encodeURIComponent(String(editor.selection.end.line))}`
+        + `&end_col=${encodeURIComponent(String(editor.selection.end.character))}`)
     } catch (e) {
         showError(e);
     }
@@ -168,7 +113,7 @@ async function searchCommand(editor: vscode.TextEditor) {
         }
 
         // Search in browser.
-        opn(`${sourcegraphURL()}search?q=${encodeURIComponent(query)}&utm_source=VSCode-${VERSION}`)
+        opn(`${sourcegraphURL()}-/editor/?search=${encodeURIComponent(query)}&editor=${encodeURIComponent("VSCode")}&version=${encodeURIComponent(VERSION)}`)
     } catch (e) {
         showError(e);
     }
