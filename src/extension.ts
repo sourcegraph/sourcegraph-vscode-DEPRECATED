@@ -6,7 +6,7 @@ const execa = require('execa');
 const url = require('url');
 const path = require('path');
 
-const VERSION = "v1.0.4"
+const VERSION = "v1.0.5"
 
 // gitRemotes returns the names of all git remotes, e.g. ["origin", "foobar"]
 async function gitRemotes(repoDir: string) {
@@ -102,28 +102,10 @@ async function openCommand(editor: vscode.TextEditor) {
     }
 }
 
-// searchCommand is the command implementation for searching a cursor selection
-// on Sourcegraph.
-async function searchCommand(editor: vscode.TextEditor) {
-    editor = vscode.window.activeTextEditor;
-    try {
-        const query = editor.document.getText(editor.selection);
-        if (query == "") {
-            return // nothing to query
-        }
-
-        // Search in browser.
-        opn(`${sourcegraphURL()}-/editor/?search=${encodeURIComponent(query)}&editor=${encodeURIComponent("VSCode")}&version=${encodeURIComponent(VERSION)}`)
-    } catch (e) {
-        showError(e);
-    }
-}
-
 // activate is called when the extension is activated.
 export function activate(context: vscode.ExtensionContext) {
     // Register our extension commands (see package.json).
     context.subscriptions.push(vscode.commands.registerCommand('extension.open', openCommand));
-    context.subscriptions.push(vscode.commands.registerCommand('extension.search', searchCommand));
 }
 
 export function deactivate() {

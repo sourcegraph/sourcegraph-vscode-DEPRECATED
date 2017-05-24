@@ -17,8 +17,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.open",
-        "onCommand:extension.search"
+        "onCommand:extension.open"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -26,10 +25,6 @@
             {
                 "command": "extension.open",
                 "title": "Sourcegraph: Open"
-            },
-            {
-                "command": "extension.search",
-                "title": "Sourcegraph: Search"
             }
         ],
         "keybindings": [
@@ -37,12 +32,6 @@
                 "command": "extension.open",
                 "key": "alt+a",
                 "mac": "alt+a",
-                "when": "editorFocus"
-            },
-            {
-                "command": "extension.search",
-                "key": "alt+s",
-                "mac": "alt+s",
                 "when": "editorFocus"
             }
         ],

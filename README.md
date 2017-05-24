@@ -42,7 +42,9 @@ Please file an issue: https://github.com/sourcegraph/sourcegraph-vscode/issues/n
 
 To develop the extension:
 
-- `git clone` the repository somewhere and open it with `code .`.
+- `git clone` the repository somewhere
+- Run `npm install` in the directory
+- Open the repo with `code .`
 - Press <kbd>F5</kbd> to open a new VS Code window with the extension loaded.
 - After making changes to `src/extension.ts`, reload the window by clicking the reload icon in the debug toolbar or with <kbd>F5</kbd>.
 - To release a new version:
@@ -58,4 +60,5 @@ To develop the extension:
 
 ## Version History
 
-- v1.0.0 - Initial Release; basic Open File & Search functionality.
+- v1.0.5 - Tested, bug fixes.
+- v1.0.0 - Initial Release; basic Open File functionality.
