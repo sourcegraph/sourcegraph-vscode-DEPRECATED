@@ -2,7 +2,7 @@
     "name": "sourcegraph",
     "displayName": "Sourcegraph",
     "description": "Sourcegraph for VS Code",
-    "version": "1.0.5",
+    "version": "1.0.8",
     "publisher": "sourcegraph",
     "license": "MIT",
     "icon": "images/logo.png",
@@ -17,7 +17,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.open"
+        "onCommand:extension.open",
+        "onCommand:extension.search"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -25,6 +26,10 @@
             {
                 "command": "extension.open",
                 "title": "Sourcegraph: Open"
+            },
+            {
+                "command": "extension.search",
+                "title": "Sourcegraph: Search"
             }
         ],
         "keybindings": [
@@ -32,6 +37,12 @@
                 "command": "extension.open",
                 "key": "alt+a",
                 "mac": "alt+a",
+                "when": "editorFocus"
+            },
+            {
+                "command": "extension.search",
+                "key": "alt+s",
+                "mac": "alt+s",
                 "when": "editorFocus"
             }
         ],

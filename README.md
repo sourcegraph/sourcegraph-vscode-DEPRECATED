@@ -17,6 +17,7 @@ Keyboard Shortcuts:
 | Description                     | Mac                 | Linux / Windows  |
 |---------------------------------|---------------------|------------------|
 | Open file in Sourcegraph        | <kbd>Option+A</kbd> | <kbd>Alt+A</kbd> |
+| Search selection in Sourcegraph | <kbd>Option+S</kbd> | <kbd>Alt+S</kbd> |
 
 
 ## Extension Settings
@@ -59,5 +60,6 @@ To develop the extension:
 
 ## Version History
 
-- v1.0.5 - Tested, bug fixes.
+- v1.0.8 - Added back and fixed search functionality.
+- v1.0.5 - Temporarily removed broken search functionality.
 - v1.0.0 - Initial Release; basic Open File functionality.

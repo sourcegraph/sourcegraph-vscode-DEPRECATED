@@ -6,7 +6,7 @@ const execa = require('execa');
 const url = require('url');
 const path = require('path');
 
-const VERSION = "v1.0.5"
+const VERSION = "v1.0.8"
 
 // gitRemotes returns the names of all git remotes, e.g. ["origin", "foobar"]
 async function gitRemotes(repoDir: string) {
@@ -60,17 +60,24 @@ function sourcegraphURL() {
 }
 
 // repoInfo returns the Sourcegraph repository URI, and the file path relative
-// to the repository root. If the repository URI cannot be determined, an
-// exception is thrown.
+// to the repository root. If the repository URI cannot be determined, empty
+// strings are returned.
 async function repoInfo(fileName: string) {
-    // Determine repository root directory.
-    const fileDir = path.dirname(fileName)
-    const repoRoot = await gitRootDir(fileDir)
+    let remoteURL = "";
+    let branch = "";
+    let fileRel = "";
+    try{
+        // Determine repository root directory.
+        const fileDir = path.dirname(fileName)
+        const repoRoot = await gitRootDir(fileDir)
 
-    // Determine file path, relative to repository root.
-    const fileRel = fileName.slice(repoRoot.length + 1)
-    const remoteURL = await gitDefaultRemoteURL(repoRoot)
-    const branch = await gitBranch(repoRoot)
+        // Determine file path, relative to repository root.
+        fileRel = fileName.slice(repoRoot.length + 1)
+        remoteURL = await gitDefaultRemoteURL(repoRoot)
+        branch = await gitBranch(repoRoot)
+    } catch (e) {
+        console.log("repoInfo:", e);
+    }
     return [remoteURL, branch, fileRel]
 }
 
@@ -84,7 +91,10 @@ function showError(err: Error): void {
 async function openCommand(editor: vscode.TextEditor) {
     editor = vscode.window.activeTextEditor;
     try {
-        const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
+        const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath);
+        if (remoteURL == "") {
+            return;
+        }
 
         // Open in browser.
         opn(`${sourcegraphURL()}-/editor`
@@ -96,7 +106,32 @@ async function openCommand(editor: vscode.TextEditor) {
         + `&start_row=${encodeURIComponent(String(editor.selection.start.line))}`
         + `&start_col=${encodeURIComponent(String(editor.selection.start.character))}`
         + `&end_row=${encodeURIComponent(String(editor.selection.end.line))}`
-        + `&end_col=${encodeURIComponent(String(editor.selection.end.character))}`)
+        + `&end_col=${encodeURIComponent(String(editor.selection.end.character))}`);
+    } catch (e) {
+        showError(e);
+    }
+}
+
+// searchCommand is the command implementation for searching a cursor selection
+// on Sourcegraph.
+async function searchCommand(editor: vscode.TextEditor) {
+    editor = vscode.window.activeTextEditor;
+    try {
+        const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath);
+
+        const query = editor.document.getText(editor.selection);
+        if (query == "") {
+            return // nothing to query
+        }
+
+        // Search in browser.
+        opn(`${sourcegraphURL()}-/editor`
+        + `?remote_url=${encodeURIComponent(remoteURL)}`
+        + `&branch=${encodeURIComponent(branch)}`
+        + `&file=${encodeURIComponent(fileRel)}`
+        + `&editor=${encodeURIComponent("VSCode")}`
+        + `&version=${encodeURIComponent(VERSION)}`
+        + `&search=${encodeURIComponent(query)}`);
     } catch (e) {
         showError(e);
     }
@@ -106,6 +141,7 @@ async function openCommand(editor: vscode.TextEditor) {
 export function activate(context: vscode.ExtensionContext) {
     // Register our extension commands (see package.json).
     context.subscriptions.push(vscode.commands.registerCommand('extension.open', openCommand));
+    context.subscriptions.push(vscode.commands.registerCommand('extension.search', searchCommand));
 }
 
 export function deactivate() {
