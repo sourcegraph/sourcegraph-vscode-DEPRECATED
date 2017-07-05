@@ -2,6 +2,9 @@
 
 All changes to the Sourcegraph VS Code extension are documented in this file.
 
+### 1.0.9
+Changed README badge from SVG to PNG to comply with recent VS Code change.
+
 ### 1.0.8
 
 Added back and fixed search functionality.
