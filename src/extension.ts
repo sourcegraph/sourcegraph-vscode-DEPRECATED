@@ -6,7 +6,7 @@ const execa = require("execa");
 const url = require("url");
 const path = require("path");
 
-const VERSION = "v1.0.9";
+const VERSION = "v1.0.10";
 
 // gitRemotes returns the names of all git remotes, e.g. ["origin", "foobar"]
 async function gitRemotes(repoDir: string) {
@@ -58,10 +58,10 @@ async function gitBranch(repoDir: string) {
 }
 
 function sourcegraphURL() {
-  // Support old "URL" key or new "url" key.
+  // Use "remote.endpoint" when the extension is installed in Sourcegraph Editor, else use "sourcegraph.url"
   const url =
-    vscode.workspace.getConfiguration("sourcegraph").get<string>("url") ||
-    vscode.workspace.getConfiguration("sourcegraph").get<string>("URL");
+    vscode.workspace.getConfiguration("remote").get<string>("endpoint") ||
+    vscode.workspace.getConfiguration("sourcegraph").get<string>("url");
   if (!url.endsWith("/")) {
     return url + "/";
   }
