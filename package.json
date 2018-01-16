@@ -52,7 +52,7 @@
           "type": ["string"],
           "default": "https://sourcegraph.com",
           "description":
-            "The Sourcegraph URL to use. Specify your Sourcegraph Server instance's root URL here, if applicable. When this extension is installed in Sourcegraph Editor, 'remote.configuration' is used instead."
+            "The Sourcegraph URL to use. Specify your Sourcegraph Server instance's root URL here, if applicable. When this extension is installed in Sourcegraph Editor, 'remote.endpoint' is used instead."
         }
       }
     }
