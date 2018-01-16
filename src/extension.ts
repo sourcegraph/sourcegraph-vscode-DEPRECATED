@@ -58,7 +58,7 @@ async function gitBranch(repoDir: string) {
 }
 
 function sourcegraphURL() {
-  // When the extension is installed in Sourcegraph Editor, use "remote.endpoint", else use "sourcegraph.url"
+  // Use "remote.endpoint" when the extension is installed in Sourcegraph Editor, else use "sourcegraph.url"
   const url =
     vscode.workspace.getConfiguration("remote").get<string>("endpoint") ||
     vscode.workspace.getConfiguration("sourcegraph").get<string>("url");
