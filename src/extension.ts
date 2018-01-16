@@ -66,10 +66,7 @@ function sourcegraphURL() {
   let url = vscode.workspace.getConfiguration("sourcegraph").get<string>("url");
   // Use remote.endpoint if it is configured and sourcegraph.url is not.
   if (url === DEFAULT_URL) {
-    const remoteEndpoint = vscode.workspace.getConfiguration("remote").get<string>("endpoint");
-    if (remoteEndpoint) {
-      url = remoteEndpoint;
-    }
+    url = vscode.workspace.getConfiguration("remote").get<string>("endpoint") || DEFAULT_URL;
   }
   if (!url.endsWith("/")) {
     return url + "/";
