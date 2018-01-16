@@ -48,7 +48,7 @@
       "type": "object",
       "title": "Sourcegraph extension configuration",
       "properties": {
-        "sourcegraph.url": {
+        "remote.endpoint": {
           "type": ["string"],
           "default": "https://sourcegraph.com",
           "description":

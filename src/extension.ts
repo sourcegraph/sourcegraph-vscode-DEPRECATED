@@ -58,8 +58,9 @@ async function gitBranch(repoDir: string) {
 }
 
 function sourcegraphURL() {
-  // Support old "URL" key or new "url" key.
+  // Support deprecated formats: sourcegraph.URL, sourcegraph.url
   const url =
+    vscode.workspace.getConfiguration("remote").get<string>("endpoint") ||
     vscode.workspace.getConfiguration("sourcegraph").get<string>("url") ||
     vscode.workspace.getConfiguration("sourcegraph").get<string>("URL");
   if (!url.endsWith("/")) {
