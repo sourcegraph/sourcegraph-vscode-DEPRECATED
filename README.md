@@ -60,6 +60,8 @@ To develop the extension:
 
 ## Version History
 
+- v1.0.10 - Use `remote.endpoint` configuration instead of `sourcegraph.url` when installed in Sourcegraph Editor.
+- v1.0.9 - Changed README badge from SVG to PNG to comply with recent VS Code change.
 - v1.0.8 - Added back and fixed search functionality.
 - v1.0.5 - Temporarily removed broken search functionality.
 - v1.0.0 - Initial Release; basic Open File functionality.

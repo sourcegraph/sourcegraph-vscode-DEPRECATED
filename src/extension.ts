@@ -6,7 +6,7 @@ const execa = require("execa");
 const url = require("url");
 const path = require("path");
 
-const VERSION = "v1.0.9";
+const VERSION = "v1.0.10";
 
 // gitRemotes returns the names of all git remotes, e.g. ["origin", "foobar"]
 async function gitRemotes(repoDir: string) {

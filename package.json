@@ -2,7 +2,7 @@
   "name": "sourcegraph",
   "displayName": "Sourcegraph",
   "description": "Sourcegraph for VS Code",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "publisher": "sourcegraph",
   "license": "MIT",
   "icon": "images/logo.png",
@@ -13,7 +13,9 @@
   "engines": {
     "vscode": "^1.11.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [
     "onCommand:extension.open",
     "onCommand:extension.search"
@@ -49,10 +51,11 @@
       "title": "Sourcegraph extension configuration",
       "properties": {
         "sourcegraph.url": {
-          "type": ["string"],
+          "type": [
+            "string"
+          ],
           "default": "https://sourcegraph.com",
-          "description":
-            "The Sourcegraph URL to use. Specify your Sourcegraph Server instance's root URL here, if applicable. When this extension is installed in Sourcegraph Editor, 'remote.endpoint' is used instead."
+          "description": "The Sourcegraph URL to use. Specify your Sourcegraph Server instance's root URL here, if applicable. When this extension is installed in Sourcegraph Editor, 'remote.endpoint' is used instead."
         }
       }
     }
