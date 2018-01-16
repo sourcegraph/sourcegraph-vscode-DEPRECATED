@@ -57,12 +57,20 @@ async function gitBranch(repoDir: string) {
   });
 }
 
+/** 
+ * Default value for sourcegraph.url configuration.
+ */
+const DEFAULT_URL = "https://sourcegraph.com";
+
 function sourcegraphURL() {
-  // Support old "URL" key, new "url" key, or remote.endpoint.
-  const url =
-    vscode.workspace.getConfiguration("sourcegraph").get<string>("url") ||
-    vscode.workspace.getConfiguration("sourcegraph").get<string>("URL") ||
-    vscode.workspace.getConfiguration("remote").get<string>("endpoint");
+  let url = vscode.workspace.getConfiguration("sourcegraph").get<string>("url");
+  // Use remote.endpoint if it is configured and sourcegraph.url is not.
+  if (url === DEFAULT_URL) {
+    const remoteEndpoint = vscode.workspace.getConfiguration("remote").get<string>("endpoint");
+    if (remoteEndpoint) {
+      url = remoteEndpoint;
+    }
+  }
   if (!url.endsWith("/")) {
     return url + "/";
   }
