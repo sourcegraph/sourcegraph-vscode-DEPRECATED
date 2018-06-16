@@ -56,6 +56,11 @@
           ],
           "default": "https://sourcegraph.com",
           "description": "The Sourcegraph URL to use. Specify your Sourcegraph Server instance's root URL here, if applicable. When this extension is installed in Sourcegraph Editor, 'remote.endpoint' is used instead."
+        },
+        "lsp.trace": {
+          "type": "boolean",
+          "default": false,
+          "description": "Print trace logs of all LSP communication with the language server"
         }
       }
     }
@@ -67,14 +72,20 @@
     "test": "node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "typescript": "^2.0.3",
-    "vscode": "^1.0.0",
+    "@types/mocha": "^2.2.32",
+    "@types/node": "^6.0.113",
     "mocha": "^2.3.3",
-    "@types/node": "^6.0.40",
-    "@types/mocha": "^2.2.32"
+    "typescript": "^2.0.3",
+    "vscode": "^1.0.0"
   },
   "dependencies": {
     "execa": "^0.6.3",
-    "opn": "^5.0.0"
+    "isomorphic-fetch": "^2.2.1",
+    "opn": "^5.0.0",
+    "universal-websocket-client": "^1.0.2",
+    "uuid": "^3.2.1",
+    "vscode-jsonrpc": "^3.6.2",
+    "vscode-languageclient": "^4.2.1",
+    "vscode-languageserver-types": "^3.8.2"
   }
 }
