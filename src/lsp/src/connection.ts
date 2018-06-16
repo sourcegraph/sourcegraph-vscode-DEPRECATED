@@ -5,10 +5,10 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { DataCallback, Message, MessageReader, MessageWriter, RequestMessage } from '@sourcegraph/vscode-jsonrpc';
-import { AbstractMessageReader } from '@sourcegraph/vscode-jsonrpc/lib/messageReader';
-import { AbstractMessageWriter } from '@sourcegraph/vscode-jsonrpc/lib/messageWriter';
-import { MessageTransports } from '@sourcegraph/vscode-languageclient';
+import { DataCallback, Message, MessageReader, MessageWriter, RequestMessage } from 'vscode-jsonrpc';
+import { AbstractMessageReader } from 'vscode-jsonrpc/lib/messageReader';
+import { AbstractMessageWriter } from 'vscode-jsonrpc/lib/messageWriter';
+import { MessageTransports } from 'vscode-languageclient';
 import * as WebSocket from 'universal-websocket-client';
 
 /**
@@ -23,13 +23,12 @@ import * as WebSocket from 'universal-websocket-client';
 export function webSocketStreamOpener(url: string, requestTracer?: (trace: MessageTrace) => void, connectionRetryTimeout: number = 20000): Promise<MessageTransports> {
 	const deadline = Date.now() + connectionRetryTimeout;
 	return new Promise((resolve, reject) => {
-		const cookie = vscode.workspace.getConfiguration('remote').get<string>('cookie');
+		// const cookie = vscode.workspace.getConfiguration('remote').get<string>('cookie');
 		const headers: { [name: string]: string } = {
 			'Content-Type': 'application/json; charset=utf-8',
 		};
-		if (cookie) {
-			headers['Authorization'] = `session ${cookie}`;
-		}
+
+		headers['Authorization'] = `token d9bf738612d5b4f5262dc866fa759fb86120fd3e`;
 
 		let socket = new WebSocket(url, [], { headers });
 		socket.binaryType = 'arraybuffer';
@@ -59,6 +58,9 @@ export function webSocketStreamOpener(url: string, requestTracer?: (trace: Messa
 
 				reject(ev);
 			}
+		};
+		socket.onerror = (e: any) => {
+			console.error('WTF: ', e);
 		};
 	});
 };

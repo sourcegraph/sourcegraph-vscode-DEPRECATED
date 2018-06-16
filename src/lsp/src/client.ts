@@ -5,31 +5,11 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { LanguageClient, RevealOutputChannelOn, LanguageClientOptions, ErrorCodes, MessageTransports, ProvideWorkspaceSymbolsSignature, ShowMessageParams, NotificationHandler, ResponseError, InitializeError } from '@sourcegraph/vscode-languageclient';
+import * as path from 'path';
+import { LanguageClient, RevealOutputChannelOn, LanguageClientOptions, ErrorCodes, MessageTransports, ProvideWorkspaceSymbolsSignature, ShowMessageParams, NotificationHandler, ResponseError, InitializeError } from 'vscode-languageclient';
 import { v4 as uuidV4 } from 'uuid';
 import { MessageTrace, webSocketStreamOpener } from './connection';
-import { lspWorkspace, repoExtension } from './main';
 import * as log from './log';
-
-export function activateLSP(): vscode.Disposable {
-	const toDispose: vscode.Disposable[] = []; // things that should live for this extension's lifetime
-
-	// Start workspace and initialize roots.
-	toDispose.push(lspWorkspace);
-
-	// Other disposables.
-	toDispose.push(log.outputChannel);
-
-	return {
-		dispose(): void {
-			dispose(toDispose);
-
-			if (traceOutputChannel) {
-				traceOutputChannel.dispose();
-			}
-		},
-	};
-}
 
 function dispose(toDispose: vscode.Disposable[]): void {
 	toDispose.forEach(disposable => disposable.dispose());
@@ -46,6 +26,44 @@ enum ProxyErrors {
 }
 
 /**
+ * TODO(sqs): While we migrate from extractResourceInfo to
+ * findContainingFolder/IFolderContainmentService, this function is exported and used by
+ * both the workbench and extension host processes to determine the containing folder in a
+ * limited but simple manner (that's equivalent to extractResourceInfo). In the future
+ * this implementation will become more advanced to support repositories with varying
+ * number of path components, etc.
+ */
+export function findContainingFolder(resource: vscode.Uri): vscode.Uri | undefined {
+	if (resource.scheme === 'repo') {
+		return resource.with({
+			path: resource.path.split('/').slice(0, 3).join('/'),
+		});
+	}
+	if (resource.scheme === 'repo+version') {
+		return resource.with({
+			path: resource.path.split('/').slice(0, 3).join('/'),
+			// Preserve query component of URI.
+		});
+	}
+	return undefined;
+}
+
+export function toRelativePath(folder: vscode.Uri, resource: vscode.Uri): string | undefined {
+	// Handle root with revision in querystring and resources with revision in
+	// querystring.
+	const folderString = folder.with({ query: '' }).toString(true /* skipEncoding */);
+	const resourceString = resource.with({ query: '' }).toString(true /* skipEncoding */);
+
+	const baseMatches = resourceString === folderString || resourceString.startsWith(folderString + '/');
+	const queryMatches = (!folder.query && !resource.query) || (folder.query === resource.query);
+	if (baseMatches && queryMatches) {
+		return resourceString.slice(folderString.length + 1);
+	}
+
+	return undefined; // resource is not inside folder
+}
+
+/**
 * Creates a new LSP client. The mode specifies which backend language
 * server to communicate with. The languageIds are the vscode document
 * languages that this client should be used to provide hovers, etc.,
@@ -57,12 +75,12 @@ export function newClient(mode: string, languageIds: string[], root: vscode.Uri,
 	}
 
 	const options: LanguageClientOptions = {
-		rootUri: root,
+		// rootUri: root,
 		revealOutputChannelOn: RevealOutputChannelOn.Never,
 		documentSelector: languageIds.map(languageId => ({
-			language: languageId,
-			scheme: root.scheme,
-			pattern: `${root.path}/**/*`,
+			// language: languageId,
+			// scheme: root.scheme,
+			pattern: `**/*`,
 		})),
 		initializationOptions: {
 			mode: mode,
@@ -83,16 +101,18 @@ export function newClient(mode: string, languageIds: string[], root: vscode.Uri,
 		},
 		uriConverters: {
 			code2Protocol: (value: vscode.Uri): string => {
+				// TODO find git dir
+				value = value.with({ path: value.path.slice('/Users/chrismwendt/modelgen'.length) })
 				if (value.scheme === 'file') {
 					return value.toString();
 				}
 				if (value.scheme === 'repo' || value.scheme === 'repo+version') {
-					const folder = vscode.workspace.findContainingFolder(value);
+					const folder = findContainingFolder(value);
 					if (folder) {
 						// Convert to the format that the LSP proxy server expects.
 						return vscode.Uri.parse(`git://${folder.authority}${folder.path}`).with({
 							query: commitID,
-							fragment: repoExtension.toRelativePath(folder, value),
+							fragment: toRelativePath(folder, value),
 						}).toString();
 					}
 				}
@@ -115,27 +135,31 @@ export function newClient(mode: string, languageIds: string[], root: vscode.Uri,
 			},
 		},
 		middleware: {
-			// Ignore workspace/symbol for clients whose root is not either (1) a
-			// workspace root or (2) the same root as that of the active document.
-			provideWorkspaceSymbols(query: string, token: vscode.CancellationToken, next: ProvideWorkspaceSymbolsSignature): vscode.ProviderResult<vscode.SymbolInformation[]> {
-				const isSameRootAsActiveDocument = vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.uri.toString().startsWith(root.toString() + '/');
-				const isInWorkspace = vscode.workspace.getWorkspaceFolder(root) || (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.some(folder => folder.uri.toString() === root.toString()));
-				if (isSameRootAsActiveDocument || isInWorkspace) {
-					return next(query, token);
-				}
-				return [];
-			},
-			onShowMessage: (params: ShowMessageParams, next: NotificationHandler<ShowMessageParams>) => {
-				// Suppress warnings and errors from workspaces that aren't currently open (shown when fetching
-				// external refs) to cut down on noise.
-				if (!vscode.workspace.textDocuments.some(textDocument => {
-					const folder = vscode.workspace.findContainingFolder(textDocument.uri);
-					return folder ? root.toString() === folder.toString() : false;
-				})) {
-					return;
-				}
-				next(params);
-			},
+			// provideHover: () => {
+			// 	console.error('wuuut')
+			// 	return new vscode.Hover('hi')
+			// }
+		// 	// Ignore workspace/symbol for clients whose root is not either (1) a
+		// 	// workspace root or (2) the same root as that of the active document.
+		// 	provideWorkspaceSymbols(query: string, token: vscode.CancellationToken, next: ProvideWorkspaceSymbolsSignature): vscode.ProviderResult<vscode.SymbolInformation[]> {
+		// 		const isSameRootAsActiveDocument = vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.uri.toString().startsWith(root.toString() + '/');
+		// 		const isInWorkspace = true;//vscode.workspace.getWorkspaceFolder(root) || (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.some(folder => folder.uri.toString() === root.toString()));
+		// 		if (isSameRootAsActiveDocument || isInWorkspace) {
+		// 			return next(query, token);
+		// 		}
+		// 		return [];
+		// 	},
+		// 	onShowMessage: (params: ShowMessageParams, next: NotificationHandler<ShowMessageParams>) => {
+		// 		// Suppress warnings and errors from workspaces that aren't currently open (shown when fetching
+		// 		// external refs) to cut down on noise.
+		// 		if (!vscode.workspace.textDocuments.some(textDocument => {
+		// 			const folder = vscode.workspace.findContainingFolder(textDocument.uri);
+		// 			return folder ? root.toString() === folder.toString() : false;
+		// 		})) {
+		// 			return;
+		// 		}
+		// 		next(params);
+		// 	},
 		},
 	};
 
@@ -147,12 +171,12 @@ export function newClient(mode: string, languageIds: string[], root: vscode.Uri,
 		// duplex stream).
 		protected createMessageTransports(encoding: string): Thenable<MessageTransports> {
 			const endpoint = vscode.Uri.parse(vscode.workspace.getConfiguration('remote').get<string>('endpoint'));
-			const wsOrigin = endpoint.with({ scheme: endpoint.scheme === 'http' ? 'ws' : 'wss' });
+			// const wsOrigin = endpoint.with({ scheme: endpoint.scheme === 'http' ? 'ws' : 'wss' });
 
 			// We include ?mode= in the url to make it easier to find the correct LSP
 			// websocket connection in (e.g.) the Chrome network inspector. It does not
 			// affect any behaviour.
-			const url = `${wsOrigin}/.api/lsp?mode=${mode}`;
+			const url = `ws://localhost:3080/.api/lsp`;
 			return webSocketStreamOpener(url, createRequestTracer(mode));
 		}
 	}('lsp-' + mode, 'lsp-' + mode, dummy, options);
@@ -162,9 +186,9 @@ let traceOutputChannel: vscode.OutputChannel | undefined;
 
 function createRequestTracer(languageId: string): ((trace: MessageTrace) => void) | undefined {
 	return (trace: MessageTrace) => {
-		if (!vscode.workspace.getConfiguration('lsp').get<boolean>('trace')) {
-			return undefined;
-		}
+		// if (!vscode.workspace.getConfiguration('lsp').get<boolean>('trace')) {
+		// 	return undefined;
+		// }
 
 		if (!traceOutputChannel) {
 			traceOutputChannel = vscode.window.createOutputChannel('LSP (trace)');
