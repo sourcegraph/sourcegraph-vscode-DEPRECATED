@@ -8,6 +8,8 @@ const path = require("path");
 
 const VERSION = "v1.0.10";
 
+import * as lspMain from './lsp/src/main'
+
 // gitRemotes returns the names of all git remotes, e.g. ["origin", "foobar"]
 async function gitRemotes(repoDir: string) {
   return execa("git", ["remote"], { cwd: repoDir }).then(result => {
@@ -167,6 +169,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("extension.search", searchCommand)
   );
+  lspMain.activate(context)
 }
 
 export function deactivate() {
