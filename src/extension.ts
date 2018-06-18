@@ -1,8 +1,8 @@
 'use strict'
-import * as vscode from 'vscode'
-import opn from 'opn'
 import execa from 'execa'
+import opn from 'opn'
 import * as path from 'path'
+import * as vscode from 'vscode'
 
 const VERSION = require('../package.json').version
 
@@ -28,8 +28,8 @@ async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string
  */
 async function gitDefaultRemoteURL(repoDir: string): Promise<string> {
     const remotes = await gitRemotes(repoDir)
-    if (remotes.length == 0) {
-        return Promise.reject('no configured git remotes')
+    if (remotes.length === 0) {
+        throw new Error('no configured git remotes')
     }
     if (remotes.length > 1) {
         console.log('using first git remote:', remotes[0])
@@ -114,7 +114,7 @@ async function openCommand(): Promise<void> {
         throw new Error('No active editor')
     }
     const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
-    if (remoteURL == '') {
+    if (remoteURL === '') {
         return
     }
 
@@ -163,12 +163,12 @@ async function searchCommand(): Promise<void> {
 /**
  * Called when the extension is activated.
  */
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
     // Register our extension commands (see package.json).
     context.subscriptions.push(vscode.commands.registerCommand('extension.open', handleCommandErrors(openCommand)))
     context.subscriptions.push(vscode.commands.registerCommand('extension.search', handleCommandErrors(searchCommand)))
 }
 
-export function deactivate() {
+export function deactivate(): void {
     // no-op
 }
