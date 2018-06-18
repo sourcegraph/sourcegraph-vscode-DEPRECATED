@@ -45,19 +45,7 @@ To develop the extension:
 - Press <kbd>F5</kbd> to open a new VS Code window with the extension loaded.
 - After making changes to `src/extension.ts`, reload the window by clicking the reload icon in the debug toolbar or with <kbd>F5</kbd>.
 - To release a new version:
-  1.  Update `README.md` (describe ALL changes)
-  2.  Update `CHANGELOG.md` (copy from README.md change above)
-  3.  Update `src/extension.ts` (`VERSION` constant)
-  4.  `npm version <major|minor|patch>`
-  5.  Publish on the VS Code store by following https://code.visualstudio.com/docs/extensions/publish-extension
-  - `vsce login sourcegraph` (see also https://marketplace.visualstudio.com/manage/publishers/sourcegraph)
-  - `cd sourcegraph-vscode` and `vsce publish`
-  8.  `git push && git push --tags`
-
-## Version History
-
-- v1.0.10 - Use `remote.endpoint` configuration instead of `sourcegraph.url` when installed in Sourcegraph Editor.
-- v1.0.9 - Changed README badge from SVG to PNG to comply with recent VS Code change.
-- v1.0.8 - Added back and fixed search functionality.
-- v1.0.5 - Temporarily removed broken search functionality.
-- v1.0.0 - Initial Release; basic Open File functionality.
+  1.  Update `CHANGELOG.md`
+  2.  `npm version <major|minor|patch>`
+  3.  `git push && git push --tags`
+  4.  Wait for the Travis build for your tag to finish, which will publish to the VS Marketplace

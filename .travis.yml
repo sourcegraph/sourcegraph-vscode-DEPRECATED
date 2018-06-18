@@ -4,3 +4,21 @@ node_js: '10'
 script:
   - npm run prettier
   - npm run build
+
+before_deploy:
+  - vsce package
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: vsce publish --pat $VSCE_TOKEN
+    on:
+      tags: true
+  - provider: releases
+    skip_cleanup: true
+    file: '*.vsix'
+    file_glob: true
+    api_key:
+      secure: CrV/LLpdpNLeRxz/qoMV/5wa7cJk3rmcDPDmacU3Yp0GW6apmmgn35pn23eMufxpRnEB4QnhEhTrkhDvp9JV86yHlKfU66c2tJtEP+OhIYSw3QfomJCk3s+wdeiKYsFl1dF4WkXAL6HY2K90xuln6R9+fy5LF83zmMzotYX/xZL5sSt7dDhuf79Xlrp1ATsFhjU8HVreib4ml2E4JtmcV0+2bhJUH4nedxVICP0smIqY+UhH9cAqStyFbjczSp6kzPidU8qMuGJPcygm4I+7VVphZ9yOv8gWkfeKzxyL78hXbT2OmWjKWNSA/ndhkdRJ/+xBSPcj7sSqL2oscbvyFxutHpkyi+7F+vbhUT+ODTXloHgHiVkMeFtVpU4PNJ3uad8fN44PHO9YWsSUKlEDCWLmVFk5hBUgnV9CG69+afpQ9JihKlHwkgg5wyghhXcSipNfEIElHoajlhicm9OVw+efFWH7DrZizeEu6BzbO6CteUKV93DoS/B4n+mWKgv8sgK5FRa0Y9LLJXsv0hr28kN055eZ5KrHh9t2xXcy4Jdm1y2gwLYl8444cl4UhomnzbpVA3Yrd9q3FLg4WTasRAnh+ksOsk5Vlo/68g+cFDCvtO9MCm3a3kw/ILCk5M0EYwMF/6yAGRonc9TS6sFuUcxzGiMLPWfzWRAk7vFg9v0=
+    on:
+      tags: true
