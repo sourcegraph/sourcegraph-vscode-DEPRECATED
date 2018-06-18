@@ -1,32 +1,32 @@
 'use strict'
 import * as vscode from 'vscode'
+import opn from 'opn'
+import execa from 'execa'
+import * as path from 'path'
 
-const opn = require('opn')
-const execa = require('execa')
-const url = require('url')
-const path = require('path')
+const VERSION = require('../package.json').version
 
-const VERSION = 'v1.0.10'
-
-// gitRemotes returns the names of all git remotes, e.g. ["origin", "foobar"]
-async function gitRemotes(repoDir: string) {
-    return execa('git', ['remote'], { cwd: repoDir }).then(result => {
-        return result.stdout.split('\n')
-    })
+/**
+ * Returns the names of all git remotes, e.g. ["origin", "foobar"]
+ */
+async function gitRemotes(repoDir: string): Promise<string[]> {
+    const { stdout } = await execa('git', ['remote'], { cwd: repoDir })
+    return stdout.split('\n')
 }
 
-// gitRemoteURL returns the remote URL for the given remote name.
-// e.g. "origin" -> "git@github.com:foo/bar"
-async function gitRemoteURL(repoDir: string, remoteName: string) {
-    return execa('git', ['remote', 'get-url', remoteName], {
-        cwd: repoDir,
-    }).then(result => {
-        return result.stdout
-    })
+/**
+ * Returns the remote URL for the given remote name.
+ * e.g. `origin` -> `git@github.com:foo/bar`
+ */
+async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string> {
+    const { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDir })
+    return stdout
 }
 
-// gitDefaultRemoteURL returns the remote URL of the first Git remote found.
-async function gitDefaultRemoteURL(repoDir: string) {
+/**
+ * Returns the remote URL of the first Git remote found.
+ */
+async function gitDefaultRemoteURL(repoDir: string): Promise<string> {
     const remotes = await gitRemotes(repoDir)
     if (remotes.length == 0) {
         return Promise.reject('no configured git remotes')
@@ -34,44 +34,44 @@ async function gitDefaultRemoteURL(repoDir: string) {
     if (remotes.length > 1) {
         console.log('using first git remote:', remotes[0])
     }
-    return gitRemoteURL(repoDir, remotes[0])
+    return await gitRemoteURL(repoDir, remotes[0])
 }
 
-// gitRootDir returns the repository root directory for any directory within the
-// repository.
-async function gitRootDir(repoDir: string) {
-    return execa('git', ['rev-parse', '--show-toplevel'], {
-        cwd: repoDir,
-    }).then(result => {
-        return result.stdout
-    })
+/**
+ * Returns the repository root directory for any directory within the
+ * repository.
+ */
+async function gitRootDir(repoDir: string): Promise<string> {
+    const { stdout } = await execa('git', ['rev-parse', '--show-toplevel'], { cwd: repoDir })
+    return stdout
 }
 
-// gitBranch returns either the current branch name of the repository OR in all
-// other cases (e.g. detached HEAD state), it returns "HEAD".
-async function gitBranch(repoDir: string) {
-    return execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'], {
-        cwd: repoDir,
-    }).then(result => {
-        return result.stdout
-    })
+/**
+ * Returns either the current branch name of the repository OR in all
+ * other cases (e.g. detached HEAD state), it returns "HEAD".
+ */
+async function gitBranch(repoDir: string): Promise<string> {
+    const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoDir })
+    return stdout
 }
 
-function sourcegraphURL() {
+function sourcegraphURL(): string {
     // Use "remote.endpoint" when the extension is installed in Sourcegraph Editor, else use "sourcegraph.url"
     const url =
         vscode.workspace.getConfiguration('remote').get<string>('endpoint') ||
-        vscode.workspace.getConfiguration('sourcegraph').get<string>('url')
+        vscode.workspace.getConfiguration('sourcegraph').get<string>('url')! // has default value
     if (!url.endsWith('/')) {
         return url + '/'
     }
     return url
 }
 
-// repoInfo returns the Sourcegraph repository URI, and the file path relative
-// to the repository root. If the repository URI cannot be determined, empty
-// strings are returned.
-async function repoInfo(fileName: string) {
+/**
+ * Returns the Sourcegraph repository URI, and the file path relative
+ * to the repository root. If the repository URI cannot be determined, empty
+ * strings are returned.
+ */
+async function repoInfo(fileName: string): Promise<[string, string, string]> {
     let remoteURL = ''
     let branch = ''
     let fileRel = ''
@@ -90,71 +90,83 @@ async function repoInfo(fileName: string) {
     return [remoteURL, branch, fileRel]
 }
 
-// showError displays an error message to the user.
+/**
+ * Displays an error message to the user.
+ */
 function showError(err: Error): void {
     vscode.window.showErrorMessage(err.message)
 }
 
-// openCommand is the command implementation for opening a cursor selection on
-// Sourcegraph.
-async function openCommand(editor: vscode.TextEditor) {
-    editor = vscode.window.activeTextEditor
+const handleCommandErrors = (command: (...args: any[]) => any) => async (...args: any[]) => {
     try {
-        const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
-        if (remoteURL == '') {
-            return
-        }
-
-        // Open in browser.
-        opn(
-            `${sourcegraphURL()}-/editor` +
-                `?remote_url=${encodeURIComponent(remoteURL)}` +
-                `&branch=${encodeURIComponent(branch)}` +
-                `&file=${encodeURIComponent(fileRel)}` +
-                `&editor=${encodeURIComponent('VSCode')}` +
-                `&version=${encodeURIComponent(VERSION)}` +
-                `&start_row=${encodeURIComponent(String(editor.selection.start.line))}` +
-                `&start_col=${encodeURIComponent(String(editor.selection.start.character))}` +
-                `&end_row=${encodeURIComponent(String(editor.selection.end.line))}` +
-                `&end_col=${encodeURIComponent(String(editor.selection.end.character))}`
-        )
-    } catch (e) {
-        showError(e)
+        return await command(...args)
+    } catch (error) {
+        showError(error)
     }
 }
 
-// searchCommand is the command implementation for searching a cursor selection
-// on Sourcegraph.
-async function searchCommand(editor: vscode.TextEditor) {
-    editor = vscode.window.activeTextEditor
-    try {
-        const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
-
-        const query = editor.document.getText(editor.selection)
-        if (query == '') {
-            return // nothing to query
-        }
-
-        // Search in browser.
-        opn(
-            `${sourcegraphURL()}-/editor` +
-                `?remote_url=${encodeURIComponent(remoteURL)}` +
-                `&branch=${encodeURIComponent(branch)}` +
-                `&file=${encodeURIComponent(fileRel)}` +
-                `&editor=${encodeURIComponent('VSCode')}` +
-                `&version=${encodeURIComponent(VERSION)}` +
-                `&search=${encodeURIComponent(query)}`
-        )
-    } catch (e) {
-        showError(e)
+/**
+ * The command implementation for opening a cursor selection on Sourcegraph.
+ */
+async function openCommand(): Promise<void> {
+    const editor = vscode.window.activeTextEditor
+    if (!editor) {
+        throw new Error('No active editor')
     }
+    const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
+    if (remoteURL == '') {
+        return
+    }
+
+    // Open in browser.
+    await opn(
+        `${sourcegraphURL()}-/editor` +
+            `?remote_url=${encodeURIComponent(remoteURL)}` +
+            `&branch=${encodeURIComponent(branch)}` +
+            `&file=${encodeURIComponent(fileRel)}` +
+            `&editor=${encodeURIComponent('VSCode')}` +
+            `&version=${encodeURIComponent(VERSION)}` +
+            `&start_row=${encodeURIComponent(String(editor.selection.start.line))}` +
+            `&start_col=${encodeURIComponent(String(editor.selection.start.character))}` +
+            `&end_row=${encodeURIComponent(String(editor.selection.end.line))}` +
+            `&end_col=${encodeURIComponent(String(editor.selection.end.character))}`
+    )
 }
 
-// activate is called when the extension is activated.
+/**
+ * The command implementation for searching a cursor selection on Sourcegraph.
+ */
+async function searchCommand(): Promise<void> {
+    const editor = vscode.window.activeTextEditor
+    if (!editor) {
+        throw new Error('No active editor')
+    }
+    const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
+
+    const query = editor.document.getText(editor.selection)
+    if (query === '') {
+        return // nothing to query
+    }
+
+    // Search in browser.
+    await opn(
+        `${sourcegraphURL()}-/editor` +
+            `?remote_url=${encodeURIComponent(remoteURL)}` +
+            `&branch=${encodeURIComponent(branch)}` +
+            `&file=${encodeURIComponent(fileRel)}` +
+            `&editor=${encodeURIComponent('VSCode')}` +
+            `&version=${encodeURIComponent(VERSION)}` +
+            `&search=${encodeURIComponent(query)}`
+    )
+}
+
+/**
+ * Called when the extension is activated.
+ */
 export function activate(context: vscode.ExtensionContext) {
     // Register our extension commands (see package.json).
-    context.subscriptions.push(vscode.commands.registerCommand('extension.open', openCommand))
-    context.subscriptions.push(vscode.commands.registerCommand('extension.search', searchCommand))
+    context.subscriptions.push(vscode.commands.registerCommand('extension.open', handleCommandErrors(openCommand)))
+    context.subscriptions.push(vscode.commands.registerCommand('extension.search', handleCommandErrors(searchCommand)))
 }
 
 export function deactivate() {
