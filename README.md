@@ -1,6 +1,6 @@
 # Sourcegraph for Visual Studio Code
 
-[![vs marketplace](https://img.shields.io/vscode-marketplace/v/sourcegraph.sourcegraph.svg?label=vs%20marketplace)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph) [![downloads](https://img.shields.io/vscode-marketplace/d/sourcegraph.sourcegraph.svg)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph)
+[![vs marketplace](https://img.shields.io/vscode-marketplace/v/sourcegraph.sourcegraph.svg?label=vs%20marketplace)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph) [![downloads](https://img.shields.io/vscode-marketplace/d/sourcegraph.sourcegraph.svg)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph) [![build](https://travis-ci.org/sourcegraph/sourcegraph-vscode.svg?branch=master)](https://travis-ci.org/sourcegraph/sourcegraph-vscode)
 
 The Sourcegraph extension for VS Code enables you to open and search code on Sourcegraph.com easily and efficiently.
 
