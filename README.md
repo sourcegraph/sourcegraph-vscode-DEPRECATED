@@ -1,30 +1,32 @@
-# Sourcegraph for VS Code <a href="https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph"><img src="https://storage.googleapis.com/sourcegraph-assets/vscode_badge.png" width="145" height="20"></img></a>
+# Sourcegraph for Visual Studio Code
 
-The Sourcegraph extension for VS Code enables you to quickly open and search code on Sourcegraph.com easily and efficiently.
+[![vs marketplace](https://img.shields.io/vscode-marketplace/v/sourcegraph.sourcegraph.svg?label=vs%20marketplace)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph) [![downloads](https://img.shields.io/vscode-marketplace/d/sourcegraph.sourcegraph.svg)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph)
+
+The Sourcegraph extension for VS Code enables you to open and search code on Sourcegraph.com easily and efficiently.
 
 ## Installation
 
-1. Open the extensions tab on the left side of VS Code (<kbd>Cmd+Shift+X</kbd> or <kbd>Ctrl+Shift+X</kbd>).
+1. Open the extensions tab on the left side of VS Code (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>).
 2. Search for `Sourcegraph` -> `Install` and `Reload`.
 
 
 ## Usage
 
-In the command palette (`Cmd+Shift+P` or `Ctrl+Shift+P`), search for `Sourcegraph:` to see available actions.
+In the command palette (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), search for `Sourcegraph:` to see available actions.
 
 Keyboard Shortcuts:
 
-| Description                     | Mac                 | Linux / Windows  |
-|---------------------------------|---------------------|------------------|
-| Open file in Sourcegraph        | <kbd>Option+A</kbd> | <kbd>Alt+A</kbd> |
-| Search selection in Sourcegraph | <kbd>Option+S</kbd> | <kbd>Alt+S</kbd> |
+| Description                     | Mac                            | Linux / Windows             |
+|---------------------------------|--------------------------------|-----------------------------|
+| Open file in Sourcegraph        | <kbd>Option</kbd>+<kbd>A</kbd> | <kbd>Alt</kbd>+<kbd>A</kbd> |
+| Search selection in Sourcegraph | <kbd>Option</kbd>+<kbd>S</kbd> | <kbd>Alt</kbd>+<kbd>S</kbd> |
 
 
 ## Extension Settings
 
 This extension contributes the following settings:
 
-* `sourcegraph.URL`: The Sourcegraph instance to use. Specify your on-premises Sourcegraph instance here, if applicable.
+* `sourcegraph.url`: The Sourcegraph instance to use. Specify your on-premises Sourcegraph instance here, if applicable.
 
 
 ## Questions & Feedback
@@ -34,7 +36,7 @@ Please file an issue: https://github.com/sourcegraph/sourcegraph-vscode/issues/n
 
 ## Uninstallation
 
-1. Open the extensions tab on the left side of VS Code (<kbd>Cmd+Shift+X</kbd> or <kbd>Ctrl+Shift+X</kbd>).
+1. Open the extensions tab on the left side of VS Code (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>X</kbd>).
 2. Search for `Sourcegraph` -> Gear icon -> `Uninstall` and `Reload`.
 
 
@@ -51,11 +53,11 @@ To develop the extension:
   1. Update `README.md` (describe ALL changes)
   2. Update `CHANGELOG.md` (copy from README.md change above)
   3. Update `src/extension.ts` (`VERSION` constant)
-  4. Publish on the VS Code store by following https://code.visualstudio.com/docs/extensions/publish-extension (contact @slimsag or @lindaxie for access)
+  4. `npm version <major|minor|patch>`
+  4. Publish on the VS Code store by following https://code.visualstudio.com/docs/extensions/publish-extension
     - `vsce login sourcegraph` (see also https://marketplace.visualstudio.com/manage/publishers/sourcegraph)
-    - `cd sourcegraph-vscode` and `vsce publish <major|minor|patch>`
-  7. `git add . && git commit -m "all: release v<THE VERSION>" && git push`
-  8. `git tag v<THE VERSION> && git push --tags`
+    - `cd sourcegraph-vscode` and `vsce publish`
+  8. `git push && git push --tags`
 
 
 ## Version History
