@@ -1,6 +1,10 @@
 language: node_js
 node_js: '10'
 
+cache:
+  directories:
+    - ~/.npm
+
 script:
   - npm run prettier
   - npm run build
