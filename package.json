@@ -2,7 +2,7 @@
   "name": "sourcegraph",
   "displayName": "Sourcegraph",
   "description": "Sourcegraph for VS Code",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "publisher": "sourcegraph",
   "license": "MIT",
   "icon": "images/logo.png",
