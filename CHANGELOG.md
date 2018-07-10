@@ -2,6 +2,10 @@
 
 All changes to the Sourcegraph VS Code extension are documented in this file.
 
+### 1.0.12
+
+Fixed [#11](https://github.com/sourcegraph/sourcegraph-vscode/issues/11)
+
 ### 1.0.11
 
 Polished README.
