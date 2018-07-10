@@ -20,7 +20,7 @@
     "onCommand:extension.open",
     "onCommand:extension.search"
   ],
-  "main": "./out/src/extension",
+  "main": "./out/extension",
   "contributes": {
     "commands": [
       {
