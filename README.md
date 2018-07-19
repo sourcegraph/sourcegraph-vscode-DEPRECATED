@@ -1,6 +1,6 @@
 # Sourcegraph for Visual Studio Code
 
-[![vs marketplace](https://img.shields.io/vscode-marketplace/v/sourcegraph.sourcegraph.svg?label=vs%20marketplace)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph) [![downloads](https://img.shields.io/vscode-marketplace/d/sourcegraph.sourcegraph.svg)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph) [![build](https://travis-ci.com/sourcegraph/sourcegraph-vscode.svg?branch=master)](https://travis-ci.com/sourcegraph/sourcegraph-vscode)
+[![vs marketplace](https://img.shields.io/vscode-marketplace/v/sourcegraph.sourcegraph.svg?label=vs%20marketplace)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph) [![downloads](https://img.shields.io/vscode-marketplace/d/sourcegraph.sourcegraph.svg)](https://marketplace.visualstudio.com/items?itemName=sourcegraph.sourcegraph) [![build](https://travis-ci.com/sourcegraph/sourcegraph-vscode.svg?branch=master)](https://travis-ci.com/sourcegraph/sourcegraph-vscode) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 The Sourcegraph extension for VS Code enables you to open and search code on Sourcegraph.com easily and efficiently.
 
@@ -44,8 +44,4 @@ To develop the extension:
 - Open the repo with `code .`
 - Press <kbd>F5</kbd> to open a new VS Code window with the extension loaded.
 - After making changes to `src/extension.ts`, reload the window by clicking the reload icon in the debug toolbar or with <kbd>F5</kbd>.
-- To release a new version:
-  1.  Update `CHANGELOG.md`
-  2.  `npm version <major|minor|patch>`
-  3.  `git push && git push --tags`
-  4.  Wait for the Travis build for your tag to finish, which will publish to the VS Marketplace
+- To release a new version: follow [Conventional Commit Messages](https://conventionalcommits.org/) and push to/merge into to master. CI will do the release.

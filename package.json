@@ -60,8 +60,31 @@
       }
     }
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "release": {
+    "verifyConditions": [
+      "semantic-release-vsce",
+      "@semantic-release/github"
+    ],
+    "prepare": {
+      "path": "semantic-release-vsce",
+      "packageVsix": "sourcegraph-vscode.vsix"
+    },
+    "publish": [
+      "semantic-release-vsce",
+      {
+        "path": "@semantic-release/github",
+        "assets": "sourcegraph-vscode.vsix"
+      }
+    ]
+  },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
+    "commitmsg": "commitlint -e $GIT_PARAMS",
+    "semantic-release": "semantic-release",
     "prettier": "prettier \"**/*.{ts,js,json,md}\" --list-different --write",
     "tslint": "tslint \"src/**.ts\" --project tsconfig.json --config tslint.json",
     "build": "tsc -p .",
@@ -70,6 +93,8 @@
     "test": "node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
+    "@commitlint/cli": "^7.0.0",
+    "@commitlint/config-conventional": "^7.0.1",
     "@sourcegraph/prettierrc": "^2.1.1",
     "@sourcegraph/tsconfig": "^3.0.0",
     "@sourcegraph/tslint-config": "^11.1.1",
@@ -77,8 +102,11 @@
     "@types/mocha": "^2.2.32",
     "@types/node": "^10.3.3",
     "@types/opn": "^5.1.0",
+    "husky": "^0.14.3",
     "mocha": "^2.3.3",
     "prettier": "1.13.5",
+    "semantic-release": "^15.8.1",
+    "semantic-release-vsce": "^2.1.2",
     "tslint": "^5.10.0",
     "typescript": "^2.0.3",
     "vsce": "^1.42.0",
