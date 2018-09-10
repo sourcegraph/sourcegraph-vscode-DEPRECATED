@@ -103,7 +103,7 @@
     "@types/node": "^10.3.3",
     "@types/opn": "^5.1.0",
     "husky": "^0.14.3",
-    "mocha": "^2.3.3",
+    "mocha": "^5.2.0",
     "prettier": "1.13.5",
     "semantic-release": "^15.8.1",
     "semantic-release-vsce": "^2.1.2",
