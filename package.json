@@ -110,7 +110,7 @@
     "tslint": "^5.10.0",
     "typescript": "^2.0.3",
     "vsce": "^1.42.0",
-    "vscode": "^1.0.0"
+    "vscode": "^1.1.21"
   },
   "dependencies": {
     "execa": "^0.6.3",
