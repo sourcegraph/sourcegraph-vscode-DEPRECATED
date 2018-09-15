@@ -10,15 +10,15 @@
     "type": "git",
     "url": "https://github.com/sourcegraph/sourcegraph-vscode.git"
   },
+  "enableProposedApi": true,
   "engines": {
-    "vscode": "^1.11.0"
+    "vscode": "^1.27.1"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.open",
-    "onCommand:extension.search"
+    "*"
   ],
   "main": "./out/extension",
   "contributes": {
@@ -56,6 +56,12 @@
           ],
           "default": "https://sourcegraph.com",
           "description": "The base URL of the Sourcegraph instance to use."
+        },
+        "sourcegraph.accessToken": {
+          "type": [
+            "string"
+          ],
+          "description": "An access token for your account on the Sourcegraph instance configured in `sourcegraph.url`."
         }
       }
     }
@@ -90,7 +96,8 @@
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test"
+    "test": "node ./node_modules/vscode/bin/test",
+    "graphql": "get-graphql-schema https://sourcegraph.com/.api/graphql --json | gql2ts -n SourcegraphGQL -o src/typings/SourcegraphGQL.d.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
@@ -101,7 +108,10 @@
     "@types/execa": "^0.9.0",
     "@types/mocha": "^2.2.32",
     "@types/node": "^10.3.3",
+    "@types/node-fetch": "^2.1.2",
     "@types/opn": "^5.1.0",
+    "get-graphql-schema": "^2.1.1",
+    "gql2ts": "^1.8.2",
     "husky": "^0.14.3",
     "mocha": "^5.2.0",
     "prettier": "1.13.5",
@@ -114,6 +124,8 @@
   },
   "dependencies": {
     "execa": "^0.6.3",
-    "opn": "^5.0.0"
+    "node-fetch": "^2.2.0",
+    "opn": "^5.0.0",
+    "rxjs": "^6.3.2"
   }
 }
