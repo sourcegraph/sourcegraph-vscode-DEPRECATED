@@ -1,5 +1,3 @@
-'use strict'
-
 import vscode from 'vscode'
 
 export function getSourcegraphUrl(): string {

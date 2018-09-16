@@ -1,5 +1,3 @@
-'use strict'
-
 import opn from 'opn'
 import * as vscode from 'vscode'
 import { activateComments } from './comments'

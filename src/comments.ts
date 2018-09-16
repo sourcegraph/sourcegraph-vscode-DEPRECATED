@@ -1,5 +1,3 @@
-'use strict'
-
 import vscode from 'vscode'
 import { repoInfo } from './git'
 import { gql, mutateGraphQL, queryGraphQL } from './graphql'

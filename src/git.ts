@@ -1,5 +1,3 @@
-'use strict'
-
 import execa from 'execa'
 import * as path from 'path'
 

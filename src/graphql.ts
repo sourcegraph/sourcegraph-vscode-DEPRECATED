@@ -1,5 +1,3 @@
-'use strict'
-
 import { default as fetch, Headers, RequestInit } from 'node-fetch'
 import { getAccessToken, getSourcegraphUrl } from './config'
 
