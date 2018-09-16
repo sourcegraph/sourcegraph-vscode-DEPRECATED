@@ -1,5 +1,6 @@
 import execa from 'execa'
 import * as path from 'path'
+import { log } from './log';
 
 /**
  * Returns the names of all git remotes, e.g. ["origin", "foobar"]
@@ -51,25 +52,26 @@ async function gitBranch(repoDir: string): Promise<string> {
 }
 
 /**
- * Returns the Sourcegraph repository URI, and the file path relative
- * to the repository root. If the repository URI cannot be determined, empty
- * strings are returned.
+ * Returns the Git repository remote URL, the current branch, and the file path
+ * relative to the repository root. Empty strings are returned if this cannot be
+ * determined.
  */
-export async function repoInfo(fileName: string): Promise<[string, string, string]> {
+export async function repoInfo(filePath: string): Promise<[string, string, string]> {
     let remoteURL = ''
     let branch = ''
     let fileRel = ''
     try {
         // Determine repository root directory.
-        const fileDir = path.dirname(fileName)
+        const fileDir = path.dirname(filePath)
         const repoRoot = await gitRootDir(fileDir)
 
         // Determine file path, relative to repository root.
-        fileRel = fileName.slice(repoRoot.length + 1)
+        fileRel = filePath.slice(repoRoot.length + 1)
         remoteURL = await gitDefaultRemoteURL(repoRoot)
         branch = await gitBranch(repoRoot)
     } catch (e) {
-        console.log('repoInfo:', e)
+        log.appendLine(`repoInfo(${filePath}): ${e}`)
     }
+    log.appendLine(`repoInfo(${filePath}): remoteURL="${remoteURL}" branch="${branch}" fileRel="${fileRel}"`)
     return [remoteURL, branch, fileRel]
 }
