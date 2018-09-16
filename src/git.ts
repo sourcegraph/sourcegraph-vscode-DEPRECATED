@@ -1,6 +1,6 @@
 import execa from 'execa'
 import * as path from 'path'
-import { log } from './log';
+import { log } from './log'
 
 /**
  * Returns the names of all git remotes, e.g. ["origin", "foobar"]
