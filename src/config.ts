@@ -12,6 +12,6 @@ export function getSourcegraphUrl(): string {
 }
 
 export function getAccessToken(): string | undefined {
-    return 'd7307a3e796813630991f954be2be65d5ca6992c'
+    return '5328077082b4ab52940882da16b21be10abef26a'
     // return vscode.workspace.getConfiguration('sourcegraph').get<string>('accessToken')
 }

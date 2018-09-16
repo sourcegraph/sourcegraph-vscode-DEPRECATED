@@ -14,13 +14,6 @@ export interface GraphQLDocument {
 export const gql = (template: TemplateStringsArray, ...substitutions: any[]): GraphQLDocument => ({
     [graphQLContent]: String.raw(template, ...substitutions.map(s => s[graphQLContent] || s)),
 })
-// export const gql = (template: TemplateStringsArray, ...substitutions: any[]): GraphQLDocument => {
-//     const x = {
-//         [graphQLContent]: String.raw(template, ...substitutions.map(s => s[graphQLContent] || s)),
-//     }
-//     console.log('hi', x)
-//     return x
-// }
 
 export async function queryGraphQL(
     graphQLDocument: GraphQLDocument,
