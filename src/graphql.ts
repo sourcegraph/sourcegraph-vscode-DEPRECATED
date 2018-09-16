@@ -1,10 +1,7 @@
 import { default as fetch, Headers, RequestInit } from 'node-fetch'
 import { getAccessToken, getSourcegraphUrl } from './config'
 
-export async function queryGraphQL(
-    graphQLDocument: string,
-    variables: { [name: string]: any }
-): Promise<any> {
+export async function queryGraphQL(graphQLDocument: string, variables: { [name: string]: any }): Promise<any> {
     return requestGraphQL(graphQLDocument, variables) as Promise<any>
 }
 

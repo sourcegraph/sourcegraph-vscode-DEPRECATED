@@ -1,7 +1,12 @@
 import vscode from 'vscode'
 import { repoInfo } from './git'
 import { log } from './log'
-import { createThread, addCommentToThread, fetchDiscussionThreads, fetchDiscussionThreadAndComments } from './shared/api';
+import {
+    createThread,
+    addCommentToThread,
+    fetchDiscussionThreads,
+    fetchDiscussionThreadAndComments,
+} from './shared/api'
 
 export function activateComments(context: vscode.ExtensionContext): void {
     const commentProvider = new CommentProvider()
