@@ -5,7 +5,6 @@ import * as vscode from 'vscode'
 import { activateComments } from './comments'
 import { getSourcegraphUrl } from './config'
 import { repoInfo } from './git'
-import { log } from './log'
 
 const VERSION = require('../package.json').version
 
@@ -83,9 +82,6 @@ async function searchCommand(): Promise<void> {
  * Called when the extension is activated.
  */
 export function activate(context: vscode.ExtensionContext): void {
-    console.log('hi sg')
-    log.appendLine('sourcegraph')
-    log.show()
     // Register our extension commands (see package.json).
     context.subscriptions.push(vscode.commands.registerCommand('extension.open', handleCommandErrors(openCommand)))
     context.subscriptions.push(vscode.commands.registerCommand('extension.search', handleCommandErrors(searchCommand)))

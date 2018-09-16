@@ -45,7 +45,7 @@ async function requestGraphQL(
 
     const accessToken = getAccessToken()
     if (accessToken) {
-        headers.append('Authoprization', `token ${accessToken}`)
+        headers.append('Authorization', `token ${accessToken}`)
     }
 
     const query = graphQLDocument[graphQLContent]

@@ -15,12 +15,17 @@ class CommentProvider implements vscode.DocumentCommentProvider {
         document: vscode.TextDocument,
         token: vscode.CancellationToken
     ): Promise<vscode.CommentInfo> {
+        let threads: vscode.CommentThread[] = []
         try {
-            return await provideDocumentComments(document)
+            threads = await provideDocumentComments(document)
         } catch (e) {
-            log.appendLine(`provideDocumentComments error: ${e}`)
+            log.appendLine(`provideDocumentComments ${e}`)
         }
-        return { threads: [] }
+
+        const lastLine = document.lineCount - 1
+        const commentingRanges = [new vscode.Range(0, 0, lastLine, document.lineAt(lastLine).range.end.character)]
+
+        return { threads, commentingRanges }
     }
 
     public async createNewCommentThread(
@@ -29,13 +34,7 @@ class CommentProvider implements vscode.DocumentCommentProvider {
         text: string,
         token: vscode.CancellationToken
     ): Promise<vscode.CommentThread> {
-        try {
-            return await createNewCommentThread(document, range, text)
-        } catch (e) {
-            log.appendLine(`createNewCommentThread error: ${e}`)
-            log.show()
-            throw e
-        }
+        return await createNewCommentThread(document, range, text)
     }
 
     public replyToCommentThread(
@@ -53,7 +52,7 @@ class CommentProvider implements vscode.DocumentCommentProvider {
     public onDidChangeCommentThreads = this.didChangeCommentThreads.event
 }
 
-async function provideDocumentComments(document: vscode.TextDocument): Promise<vscode.CommentInfo> {
+async function provideDocumentComments(document: vscode.TextDocument): Promise<vscode.CommentThread[]> {
     log.appendLine(`provideDocumentComments ${document.uri}`)
     const [remoteUrl, branch, targetRepositoryPath] = await repoInfo(document.fileName)
     if (remoteUrl === '') {
@@ -93,16 +92,13 @@ async function provideDocumentComments(document: vscode.TextDocument): Promise<v
     for (const thread of data.discussionThreads.nodes) {
         // TODO: this assumes there is no diff between the document state and the revision
         const sel = thread.target.relativeSelection
-        log.appendLine(`Got thread ${thread.title} ${sel}`)
         if (sel) {
             const range = new vscode.Range(sel.startLine, sel.startCharacter, sel.endLine, sel.endCharacter)
             threads.push(discussionToCommentThread(document, range, thread))
         }
     }
 
-    return {
-        threads,
-    }
+    return threads
 }
 
 async function createNewCommentThread(
@@ -132,7 +128,7 @@ async function createNewCommentThread(
 
     const data = await mutateGraphQL(
         gql`
-            mutation CreateThread($input: DiscussionThreadCreateInput!) {
+            mutation CreateThread($input: DiscussionThreadCreateInput!, $branch: String!) {
                 discussions {
                     createThread(input: $input) {
                         ...DiscussionThreadFields
@@ -141,7 +137,7 @@ async function createNewCommentThread(
             }
             ${discussionThreadFieldsFragment}
         `,
-        { input }
+        { input, branch }
     )
 
     if (!data.discussions || !data.discussions.createThread) {
@@ -150,6 +146,7 @@ async function createNewCommentThread(
 
     return discussionToCommentThread(document, range, data.discussions.createThread)
 }
+
 function discussionToCommentThread(
     document: vscode.TextDocument,
     range: vscode.Range,
