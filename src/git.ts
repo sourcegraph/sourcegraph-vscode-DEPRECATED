@@ -28,7 +28,7 @@ async function gitDefaultRemoteURL(repoDir: string): Promise<string> {
         throw new Error('no configured git remotes')
     }
     if (remotes.length > 1) {
-        console.log('using first git remote:', remotes[0])
+        log.appendLine(`using first git remote: ${remotes[0]}`)
     }
     return await gitRemoteURL(repoDir, remotes[0])
 }
