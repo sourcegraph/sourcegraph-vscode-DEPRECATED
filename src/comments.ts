@@ -37,14 +37,14 @@ class CommentProvider implements vscode.DocumentCommentProvider {
         return await createNewCommentThread(document, range, text)
     }
 
-    public replyToCommentThread(
+    public async replyToCommentThread(
         document: vscode.TextDocument,
         range: vscode.Range,
         commentThread: vscode.CommentThread,
         text: string,
         token: vscode.CancellationToken
     ): Promise<vscode.CommentThread> {
-        throw new Error('hi')
+        return await replyToCommentThread(document, range, commentThread, text)
     }
 
     private didChangeCommentThreads = new vscode.EventEmitter<vscode.CommentThreadChangedEvent>()
@@ -147,6 +147,33 @@ async function createNewCommentThread(
     return discussionToCommentThread(document, range, data.discussions.createThread)
 }
 
+async function replyToCommentThread(
+    document: vscode.TextDocument,
+    range: vscode.Range,
+    thread: vscode.CommentThread,
+    text: string
+): Promise<vscode.CommentThread> {
+    const [, branch] = await repoInfo(document.fileName)
+    const data = await mutateGraphQL(
+        gql`
+            mutation AddCommentToThread($threadID: ID!, $contents: String!, $branch: String!) {
+                discussions {
+                    addCommentToThread(threadID: $threadID, contents: $contents) {
+                        ...DiscussionThreadFields
+                    }
+                }
+            }
+            ${discussionThreadFieldsFragment}
+        `,
+        { threadID: thread.threadId, contents: text, branch }
+    )
+
+    if (!data.discussions || !data.discussions.addCommentToThread) {
+        throw new Error(`Invalid GraphQL response for AddCommentToThread`)
+    }
+
+    return discussionToCommentThread(document, range, data.discussions.addCommentToThread)
+}
 function discussionToCommentThread(
     document: vscode.TextDocument,
     range: vscode.Range,
