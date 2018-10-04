@@ -142,6 +142,13 @@ declare namespace SourcegraphGQL {
          * The extension registry.
          */
         extensionRegistry: IExtensionRegistry
+
+        /**
+         * Queries that are only used on Sourcegraph.com.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        dotcom: IDotcomQuery
     }
 
     interface INodeOnQueryArguments {
@@ -315,8 +322,24 @@ declare namespace SourcegraphGQL {
 
         /**
          * When present, lists only the threads whose target is a repository with this ID.
+         *
+         * Only one of 'targetRepositoryID', 'targetRepositoryName', or 'targetRepositoryGitCloneURL' may be specified.
          */
         targetRepositoryID?: string | null
+
+        /**
+         * When present, lists only the threads whose target is a repository with this name.
+         *
+         * Only one of 'targetRepositoryID', 'targetRepositoryName', or 'targetRepositoryGitCloneURL' may be specified.
+         */
+        targetRepositoryName?: string | null
+
+        /**
+         * When present, lists only the threads whose target is a repository with this Git clone URL.
+         *
+         * Only one of 'targetRepositoryID', 'targetRepositoryName', or 'targetRepositoryGitCloneURL' may be specified.
+         */
+        targetRepositoryGitCloneURL?: string | null
 
         /**
          * When present, lists only the threads whose target is a repository with this file path.
@@ -371,12 +394,14 @@ declare namespace SourcegraphGQL {
         | IUser
         | IOrg
         | IOrganizationInvitation
-        | IRegistryExtension
         | IAccessToken
         | IExternalAccount
         | IPackage
         | IDependency
         | IGitRef
+        | IRegistryExtension
+        | IProductSubscription
+        | IProductLicense
 
     /**
      * An object with an ID.
@@ -1101,9 +1126,13 @@ declare namespace SourcegraphGQL {
         surveyResponses: Array<ISurveyResponse>
 
         /**
-         * A list of extensions published by this user in the extension registry.
+         * The URL to view this user's customer information (for Sourcegraph.com site admins).
+         *
+         * Only Sourcegraph.com site admins may query this field.
+         *
+         * FOR INTERNAL USE ONLY.
          */
-        registryExtensions: IRegistryExtensionConnection
+        urlForSiteAdminBilling: string | null
     }
 
     interface IAccessTokensOnUserArguments {
@@ -1118,18 +1147,6 @@ declare namespace SourcegraphGQL {
          * Returns the first n external accounts from the list.
          */
         first?: number | null
-    }
-
-    interface IRegistryExtensionsOnUserArguments {
-        /**
-         * Returns the first n extensions from the list.
-         */
-        first?: number | null
-
-        /**
-         * Returns only extensions matching the query.
-         */
-        query?: string | null
     }
 
     /**
@@ -1331,23 +1348,6 @@ declare namespace SourcegraphGQL {
          * The URL to the organization's settings.
          */
         settingsURL: string
-
-        /**
-         * A list of extensions published by this organization in the extension registry.
-         */
-        registryExtensions: IRegistryExtensionConnection
-    }
-
-    interface IRegistryExtensionsOnOrgArguments {
-        /**
-         * Returns the first n extensions from the list.
-         */
-        first?: number | null
-
-        /**
-         * Returns only extensions matching the query.
-         */
-        query?: string | null
     }
 
     /**
@@ -1366,6 +1366,23 @@ declare namespace SourcegraphGQL {
          * than the number of nodes in this object when the result is paginated.
          */
         totalCount: number
+
+        /**
+         * Pagination information.
+         */
+        pageInfo: IPageInfo
+    }
+
+    /**
+     * Pagination information. See https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo.
+     */
+    interface IPageInfo {
+        __typename: 'PageInfo'
+
+        /**
+         * Whether there is a next page of nodes in the connection.
+         */
+        hasNextPage: boolean
     }
 
     /**
@@ -1438,167 +1455,6 @@ declare namespace SourcegraphGQL {
          * The invitation was rejected by the recipient.
          */
         REJECT = 'REJECT',
-    }
-
-    /**
-     * A list of registry extensions.
-     */
-    interface IRegistryExtensionConnection {
-        __typename: 'RegistryExtensionConnection'
-
-        /**
-         * A list of registry extensions.
-         */
-        nodes: Array<IRegistryExtension>
-
-        /**
-         * The total count of registry extensions in the connection. This total count may be larger than the number of
-         * nodes in this object when the result is paginated.
-         */
-        totalCount: number
-
-        /**
-         * Pagination information.
-         */
-        pageInfo: IPageInfo
-
-        /**
-         * The URL to this list, or null if none exists.
-         */
-        url: string | null
-
-        /**
-         * Errors that occurred while communicating with remote registries to obtain the list of extensions.
-         *
-         * In order to be able to return local extensions even when the remote registry is unreachable, errors are
-         * recorded here instead of in the top-level GraphQL errors list.
-         */
-        error: string | null
-    }
-
-    /**
-     * An extension's listing in the extension registry.
-     */
-    interface IRegistryExtension {
-        __typename: 'RegistryExtension'
-
-        /**
-         * The unique, opaque, permanent ID of the extension. Do not display this ID to the user; display
-         * RegistryExtension.extensionID instead (it is friendlier and still unique, but it can be renamed).
-         */
-        id: string
-
-        /**
-         * The UUID of the extension. This identifies the extension externally (along with the origin). The UUID maps
-         * 1-to-1 to RegistryExtension.id.
-         */
-        uuid: string
-
-        /**
-         * The publisher of the extension. If this extension is from a remote registry, the publisher may be null.
-         */
-        publisher: RegistryPublisher | null
-
-        /**
-         * The qualified, unique name that refers to this extension, consisting of the registry name (if non-default),
-         * publisher's name, and the extension's name, all joined by "/" (for example, "acme-corp/my-extension-name").
-         */
-        extensionID: string
-
-        /**
-         * The extension ID without the registry name.
-         */
-        extensionIDWithoutRegistry: string
-
-        /**
-         * The name of the extension (not including the publisher's name).
-         */
-        name: string
-
-        /**
-         * The extension manifest, or null if none is set.
-         */
-        manifest: IExtensionManifest | null
-
-        /**
-         * The date when this extension was created on the registry.
-         */
-        createdAt: string | null
-
-        /**
-         * The date when this extension was last updated on the registry.
-         */
-        updatedAt: string | null
-
-        /**
-         * The URL to the extension on this Sourcegraph site.
-         */
-        url: string
-
-        /**
-         * The URL to the extension on the extension registry where it lives (if this is a remote
-         * extension). If this extension is local, then this field's value is null.
-         */
-        remoteURL: string | null
-
-        /**
-         * The name of this extension's registry.
-         */
-        registryName: string
-
-        /**
-         * Whether the registry extension is published on this Sourcegraph site.
-         */
-        isLocal: boolean
-
-        /**
-         * Whether the viewer has admin privileges on this registry extension.
-         */
-        viewerCanAdminister: boolean
-    }
-
-    /**
-     * A publisher of a registry extension.
-     */
-    type RegistryPublisher = IUser | IOrg
-
-    /**
-     * A description of the extension, how to run or access it, and when to activate it.
-     */
-    interface IExtensionManifest {
-        __typename: 'ExtensionManifest'
-
-        /**
-         * The raw JSON contents of the manifest.
-         */
-        raw: string
-
-        /**
-         * The title specified in the manifest, if any.
-         */
-        title: string | null
-
-        /**
-         * The description specified in the manifest, if any.
-         */
-        description: string | null
-
-        /**
-         * The URL to the bundled JavaScript source code for the extension, if any.
-         */
-        bundleURL: string | null
-    }
-
-    /**
-     * Pagination information. See https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo.
-     */
-    interface IPageInfo {
-        __typename: 'PageInfo'
-
-        /**
-         * Whether there is a next page of nodes in the connection.
-         */
-        hasNextPage: boolean
     }
 
     /**
@@ -1992,7 +1848,7 @@ declare namespace SourcegraphGQL {
         /**
          * A list of directories in this tree.
          */
-        directories: Array<IGitTree>
+        directories: Array<IGitTree | null>
 
         /**
          * A list of files in this tree.
@@ -2008,6 +1864,11 @@ declare namespace SourcegraphGQL {
          * Symbols defined in this tree.
          */
         symbols: ISymbolConnection
+
+        /**
+         * Whether this tree entry is a single child
+         */
+        isSingleChild: boolean
     }
 
     interface IDirectoriesOnGitTreeArguments {
@@ -2043,10 +1904,18 @@ declare namespace SourcegraphGQL {
         first?: number | null
 
         /**
-         * Recurse into sub-trees.
+         * Recurse into sub-trees. If true, implies recursiveSingleChild.
          * @default false
          */
         recursive?: boolean | null
+
+        /**
+         * Recurse into sub-trees of single-child directories. If true, we return a flat list of
+         * every directory that is a single child, and any directories or files that are
+         * nested in a single child.
+         * @default false
+         */
+        recursiveSingleChild?: boolean | null
     }
 
     interface ISymbolsOnGitTreeArguments {
@@ -2059,6 +1928,19 @@ declare namespace SourcegraphGQL {
          * Return symbols matching the query.
          */
         query?: string | null
+    }
+
+    interface IIsSingleChildOnGitTreeArguments {
+        /**
+         * Returns the first n files in the tree.
+         */
+        first?: number | null
+
+        /**
+         * Recurse into sub-trees.
+         * @default false
+         */
+        recursive?: boolean | null
     }
 
     /**
@@ -2111,6 +1993,11 @@ declare namespace SourcegraphGQL {
          * Submodule metadata if this tree points to a submodule
          */
         submodule: ISubmodule | null
+
+        /**
+         * Whether this tree entry is a single child
+         */
+        isSingleChild: boolean
     }
 
     interface ISymbolsOnTreeEntryArguments {
@@ -2123,6 +2010,19 @@ declare namespace SourcegraphGQL {
          * Return symbols matching the query.
          */
         query?: string | null
+    }
+
+    interface IIsSingleChildOnTreeEntryArguments {
+        /**
+         * Returns the first n files in the tree.
+         */
+        first?: number | null
+
+        /**
+         * Recurse into sub-trees.
+         * @default false
+         */
+        recursive?: boolean | null
     }
 
     /**
@@ -2337,6 +2237,11 @@ declare namespace SourcegraphGQL {
          * Symbols defined in this blob.
          */
         symbols: ISymbolConnection
+
+        /**
+         * Always false, since a blob is a file, not directory.
+         */
+        isSingleChild: boolean
     }
 
     interface IBlameOnGitBlobArguments {
@@ -2365,6 +2270,25 @@ declare namespace SourcegraphGQL {
          * Return symbols matching the query.
          */
         query?: string | null
+    }
+
+    interface IIsSingleChildOnGitBlobArguments {
+        /**
+         * Returns the first n files in the tree.
+         */
+        first?: number | null
+
+        /**
+         * Recurse into sub-trees.
+         * @default false
+         */
+        recursive?: boolean | null
+
+        /**
+         * Recurse into sub-trees of single-child directories
+         * @default false
+         */
+        recursiveSingleChild?: boolean | null
     }
 
     /**
@@ -4078,6 +4002,34 @@ declare namespace SourcegraphGQL {
          * The date when the discussion thread was last updated.
          */
         updatedAt: string
+
+        /**
+         * Reports filed by users about this comment. Only admins will receive a non
+         * empty list of reports.
+         *
+         * When discussions.abuseProtection in the site config is set to false, this
+         * will always be an empty list.
+         */
+        reports: Array<string>
+
+        /**
+         * Whether or not the comment can be reported.
+         *
+         * This is always false when discussions.abuseProtection in the site config is set to false.
+         */
+        canReport: boolean
+
+        /**
+         * Whether or not the comment can be deleted.
+         */
+        canDelete: boolean
+
+        /**
+         * Whether or not the comment can have its reports be cleared.
+         *
+         * This is always false when discussions.abuseProtection in the site config is set to false.
+         */
+        canClearReports: boolean
     }
 
     interface IHtmlOnDiscussionCommentArguments {
@@ -4412,7 +4364,7 @@ declare namespace SourcegraphGQL {
         /**
          * "Did you mean: ____" query proposals
          */
-        proposedQueries: Array<ISearchQueryDescription>
+        proposedQueries: Array<ISearchQueryDescription> | null
     }
 
     /**
@@ -4736,11 +4688,9 @@ declare namespace SourcegraphGQL {
         sendsEmailVerificationEmails: boolean
 
         /**
-         * Information about this site's license to use Sourcegraph software. This is about the license
-         * for the use of Sourcegraph itself; it is not about repository licenses or open-source
-         * licenses.
+         * Information about this site's product subscription status.
          */
-        sourcegraphLicense: ISourcegraphLicense
+        productSubscription: IProductSubscriptionStatus
 
         /**
          * The activity.
@@ -5096,65 +5046,54 @@ declare namespace SourcegraphGQL {
     }
 
     /**
-     * Information about this site's license to use Sourcegraph software. This is about a license for the
-     * use of Sourcegraph itself; it is not about a repository license or an open-source license.
+     * Information about this site's product subscription (which enables access to and renewals of a product license).
      */
-    interface ISourcegraphLicense {
-        __typename: 'SourcegraphLicense'
+    interface IProductSubscriptionStatus {
+        __typename: 'ProductSubscriptionStatus'
 
         /**
-         * An identifier for this Sourcegraph site, generated randomly upon initialization. This value
-         * can be overridden by the site admin.
+         * The full name of the product in use, such as "Sourcegraph Enterprise".
          */
-        siteID: string
+        fullProductName: string
 
         /**
-         * An email address of the initial site admin.
+         * The actual total number of users on this Sourcegraph site.
          */
-        primarySiteAdminEmail: string
+        actualUserCount: number
 
         /**
-         * The total number of users on this Sourcegraph site.
+         * The product license associated with this subscription, if any.
+         */
+        license: IProductLicenseInfo | null
+    }
+
+    /**
+     * Information about this site's product license (which activates certain Sourcegraph features).
+     */
+    interface IProductLicenseInfo {
+        __typename: 'ProductLicenseInfo'
+
+        /**
+         * The full name of the product that this license is for. To get the product name for the current
+         * Sourcegraph site, use ProductSubscriptionStatus.fullProductName instead (to handle cases where there is
+         * no license).
+         */
+        fullProductName: string
+
+        /**
+         * Tags indicating the product plan and features activated by this license.
+         */
+        tags: Array<string>
+
+        /**
+         * The number of users allowed by this license.
          */
         userCount: number
 
         /**
-         * The Sourcegraph product name ("Sourcegraph Server" or "Sourcegraph Data Center" when running
-         * in production).
+         * The date when this license expires.
          */
-        productName: string
-
-        /**
-         * A list of premium Sourcegraph features and associated information.
-         */
-        premiumFeatures: Array<ISourcegraphFeature>
-    }
-
-    /**
-     * A feature of Sourcegraph software and associated information.
-     */
-    interface ISourcegraphFeature {
-        __typename: 'SourcegraphFeature'
-
-        /**
-         * The title of this feature.
-         */
-        title: string
-
-        /**
-         * A description of this feature.
-         */
-        description: string
-
-        /**
-         * Whether this feature is enabled on this Sourcegraph site.
-         */
-        enabled: boolean
-
-        /**
-         * A URL with more information about this feature.
-         */
-        informationURL: string
+        expiresAt: string
     }
 
     /**
@@ -5204,6 +5143,12 @@ declare namespace SourcegraphGQL {
          * The anonymous user count.
          */
         anonymousUserCount: number
+
+        /**
+         * The count of registered users that have been active on a code host integration.
+         * Excludes anonymous users.
+         */
+        integrationUserCount: number
     }
 
     /**
@@ -5320,7 +5265,7 @@ declare namespace SourcegraphGQL {
          * Typically, the client passes the list of added and enabled extension IDs in this parameter so that the
          * results include those extensions first (which is typically what the user prefers).
          */
-        prioritizeExtensionIDs: Array<string>
+        prioritizeExtensionIDs?: Array<string> | null
     }
 
     interface IPublishersOnExtensionRegistryArguments {
@@ -5328,6 +5273,155 @@ declare namespace SourcegraphGQL {
          * Return the first n publishers from the list.
          */
         first?: number | null
+    }
+
+    /**
+     * An extension's listing in the extension registry.
+     */
+    interface IRegistryExtension {
+        __typename: 'RegistryExtension'
+
+        /**
+         * The unique, opaque, permanent ID of the extension. Do not display this ID to the user; display
+         * RegistryExtension.extensionID instead (it is friendlier and still unique, but it can be renamed).
+         */
+        id: string
+
+        /**
+         * The UUID of the extension. This identifies the extension externally (along with the origin). The UUID maps
+         * 1-to-1 to RegistryExtension.id.
+         */
+        uuid: string
+
+        /**
+         * The publisher of the extension. If this extension is from a remote registry, the publisher may be null.
+         */
+        publisher: RegistryPublisher | null
+
+        /**
+         * The qualified, unique name that refers to this extension, consisting of the registry name (if non-default),
+         * publisher's name, and the extension's name, all joined by "/" (for example, "acme-corp/my-extension-name").
+         */
+        extensionID: string
+
+        /**
+         * The extension ID without the registry name.
+         */
+        extensionIDWithoutRegistry: string
+
+        /**
+         * The name of the extension (not including the publisher's name).
+         */
+        name: string
+
+        /**
+         * The extension manifest, or null if none is set.
+         */
+        manifest: IExtensionManifest | null
+
+        /**
+         * The date when this extension was created on the registry.
+         */
+        createdAt: string | null
+
+        /**
+         * The date when this extension was last updated on the registry.
+         */
+        updatedAt: string | null
+
+        /**
+         * The URL to the extension on this Sourcegraph site.
+         */
+        url: string
+
+        /**
+         * The URL to the extension on the extension registry where it lives (if this is a remote
+         * extension). If this extension is local, then this field's value is null.
+         */
+        remoteURL: string | null
+
+        /**
+         * The name of this extension's registry.
+         */
+        registryName: string
+
+        /**
+         * Whether the registry extension is published on this Sourcegraph site.
+         */
+        isLocal: boolean
+
+        /**
+         * Whether the viewer has admin privileges on this registry extension.
+         */
+        viewerCanAdminister: boolean
+    }
+
+    /**
+     * A publisher of a registry extension.
+     */
+    type RegistryPublisher = IUser | IOrg
+
+    /**
+     * A description of the extension, how to run or access it, and when to activate it.
+     */
+    interface IExtensionManifest {
+        __typename: 'ExtensionManifest'
+
+        /**
+         * The raw JSON contents of the manifest.
+         */
+        raw: string
+
+        /**
+         * The title specified in the manifest, if any.
+         */
+        title: string | null
+
+        /**
+         * The description specified in the manifest, if any.
+         */
+        description: string | null
+
+        /**
+         * The URL to the bundled JavaScript source code for the extension, if any.
+         */
+        bundleURL: string | null
+    }
+
+    /**
+     * A list of registry extensions.
+     */
+    interface IRegistryExtensionConnection {
+        __typename: 'RegistryExtensionConnection'
+
+        /**
+         * A list of registry extensions.
+         */
+        nodes: Array<IRegistryExtension>
+
+        /**
+         * The total count of registry extensions in the connection. This total count may be larger than the number of
+         * nodes in this object when the result is paginated.
+         */
+        totalCount: number
+
+        /**
+         * Pagination information.
+         */
+        pageInfo: IPageInfo
+
+        /**
+         * The URL to this list, or null if none exists.
+         */
+        url: string | null
+
+        /**
+         * Errors that occurred while communicating with remote registries to obtain the list of extensions.
+         *
+         * In order to be able to return local extensions even when the remote registry is unreachable, errors are
+         * recorded here instead of in the top-level GraphQL errors list.
+         */
+        error: string | null
     }
 
     /**
@@ -5343,6 +5437,314 @@ declare namespace SourcegraphGQL {
 
         /**
          * The total count of publishers in the connection. This total count may be larger than the number of
+         * nodes in this object when the result is paginated.
+         */
+        totalCount: number
+
+        /**
+         * Pagination information.
+         */
+        pageInfo: IPageInfo
+    }
+
+    /**
+     * Mutations that are only used on Sourcegraph.com.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IDotcomQuery {
+        __typename: 'DotcomQuery'
+
+        /**
+         * A list of product subscriptions.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        productSubscriptions: IProductSubscriptionConnection
+
+        /**
+         * A list of product licenses.
+         *
+         * Only Sourcegraph.com site admins may perform this query.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        productLicenses: IProductLicenseConnection
+
+        /**
+         * A list of product pricing plans for Sourcegraph.
+         */
+        productPlans: Array<IProductPlan>
+    }
+
+    interface IProductSubscriptionsOnDotcomQueryArguments {
+        /**
+         * Returns the first n product subscriptions from the list.
+         */
+        first?: number | null
+
+        /**
+         * Returns only product subscriptions for the given account.
+         *
+         * Only Sourcegraph.com site admins may perform this query with account == null.
+         */
+        account?: string | null
+    }
+
+    interface IProductLicensesOnDotcomQueryArguments {
+        /**
+         * Returns the first n product subscriptions from the list.
+         */
+        first?: number | null
+
+        /**
+         * Returns only product subscriptions whose license key contains this substring.
+         */
+        licenseKeySubstring?: string | null
+
+        /**
+         * Returns only product licenses associated with the given subscription
+         */
+        productSubscriptionID?: string | null
+    }
+
+    /**
+     * A list of product subscriptions.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IProductSubscriptionConnection {
+        __typename: 'ProductSubscriptionConnection'
+
+        /**
+         * A list of product subscriptions.
+         */
+        nodes: Array<IProductSubscription>
+
+        /**
+         * The total count of product subscriptions in the connection. This total count may be larger than the number of
+         * nodes in this object when the result is paginated.
+         */
+        totalCount: number
+
+        /**
+         * Pagination information.
+         */
+        pageInfo: IPageInfo
+    }
+
+    /**
+     * A product subscription that was created on Sourcegraph.com.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IProductSubscription {
+        __typename: 'ProductSubscription'
+
+        /**
+         * The unique ID of this product subscription.
+         */
+        id: string
+
+        /**
+         * A name for the product subscription derived from its ID. The name is not guaranteed to be unique.
+         */
+        name: string
+
+        /**
+         * The user (i.e., customer) to whom this subscription is granted, or null if the account has been deleted.
+         */
+        account: IUser | null
+
+        /**
+         * The product and pricing plan that this subscription entitles the account to, or null if there is none.
+         */
+        plan: IProductPlan | null
+
+        /**
+         * The user count that this subscription entitles the account to, or null if there is none.
+         */
+        userCount: number | null
+
+        /**
+         * The date when the subscription expires.
+         */
+        expiresAt: string | null
+
+        /**
+         * A list of billing-related events related to this product subscription.
+         */
+        events: Array<IProductSubscriptionEvent>
+
+        /**
+         * The currently active product license associated with this product subscription, if any.
+         */
+        activeLicense: IProductLicense | null
+
+        /**
+         * A list of product licenses associated with this product subscription.
+         *
+         * Only Sourcegraph.com site admins may list inactive product licenses (other viewers should use
+         * ProductSubscription.activeLicense).
+         */
+        productLicenses: IProductLicenseConnection
+
+        /**
+         * The date when this product subscription was created.
+         */
+        createdAt: string
+
+        /**
+         * Whether this product subscription was archived.
+         */
+        isArchived: boolean
+
+        /**
+         * The URL to view this product subscription.
+         */
+        url: string
+
+        /**
+         * The URL to view this product subscription in the site admin area.
+         *
+         * Only Sourcegraph.com site admins may query this field.
+         */
+        urlForSiteAdmin: string | null
+
+        /**
+         * The URL to view this product subscription's billing information (for site admins).
+         *
+         * Only Sourcegraph.com site admins may query this field.
+         */
+        urlForSiteAdminBilling: string | null
+    }
+
+    interface IProductLicensesOnProductSubscriptionArguments {
+        /**
+         * Returns the first n product licenses from the list.
+         */
+        first?: number | null
+    }
+
+    /**
+     * A product pricing plan for Sourcegraph.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IProductPlan {
+        __typename: 'ProductPlan'
+
+        /**
+         * The billing system's unique ID of this pricing plan.
+         */
+        billingID: string
+
+        /**
+         * The internal name of the pricing plan (e.g., "enterprise-starter"). This is not displayed on the page but may
+         * be shown in the URL.
+         */
+        name: string
+
+        /**
+         * The title of the pricing plan (e.g., "Enterprise Starter"). This is displayed to the user and should be
+         * human-readable.
+         */
+        title: string
+
+        /**
+         * The full product name of this plan's offering (e.g., "Sourcegraph Enterprise Starter").
+         */
+        fullProductName: string
+
+        /**
+         * The price (in USD cents) for one user for a year.
+         */
+        pricePerUserPerYear: number
+    }
+
+    /**
+     * An event related to a product subscription.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IProductSubscriptionEvent {
+        __typename: 'ProductSubscriptionEvent'
+
+        /**
+         * The unique ID of the event.
+         */
+        id: string
+
+        /**
+         * The date when the event occurred.
+         */
+        date: string
+
+        /**
+         * The title of the event.
+         */
+        title: string
+
+        /**
+         * A description of the event.
+         */
+        description: string | null
+
+        /**
+         * A URL where the user can see more information about the event.
+         */
+        url: string | null
+    }
+
+    /**
+     * A product license that was created on Sourcegraph.com.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IProductLicense {
+        __typename: 'ProductLicense'
+
+        /**
+         * The unique ID of this product license.
+         */
+        id: string
+
+        /**
+         * The product subscription associated with this product license.
+         */
+        subscription: IProductSubscription
+
+        /**
+         * Information about this product license.
+         */
+        info: IProductLicenseInfo | null
+
+        /**
+         * The license key.
+         */
+        licenseKey: string
+
+        /**
+         * The date when this product license was created.
+         */
+        createdAt: string
+    }
+
+    /**
+     * A list of product licenses.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IProductLicenseConnection {
+        __typename: 'ProductLicenseConnection'
+
+        /**
+         * A list of product licenses.
+         */
+        nodes: Array<IProductLicense>
+
+        /**
+         * The total count of product licenses in the connection. This total count may be larger than the number of
          * nodes in this object when the result is paginated.
          */
         totalCount: number
@@ -5656,6 +6058,13 @@ declare namespace SourcegraphGQL {
          * Manages the extension registry.
          */
         extensionRegistry: IExtensionRegistryMutation
+
+        /**
+         * Mutations that are only used on Sourcegraph.com.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        dotcom: IDotcomMutation
     }
 
     interface IUpdateUserOnMutationArguments {
@@ -6278,13 +6687,20 @@ declare namespace SourcegraphGQL {
 
         /**
          * Updates an existing thread. Returns the updated thread.
+         *
+         * Returns null if the thread was deleted.
          */
-        updateThread: IDiscussionThread
+        updateThread: IDiscussionThread | null
 
         /**
          * Adds a new comment to a thread. Returns the updated thread.
          */
         addCommentToThread: IDiscussionThread
+
+        /**
+         * Updates an existing comment. Returns the updated thread.
+         */
+        updateComment: IDiscussionThread
     }
 
     interface ICreateThreadOnDiscussionsMutationArguments {
@@ -6298,6 +6714,10 @@ declare namespace SourcegraphGQL {
     interface IAddCommentToThreadOnDiscussionsMutationArguments {
         threadID: string
         contents: string
+    }
+
+    interface IUpdateCommentOnDiscussionsMutationArguments {
+        input: IDiscussionCommentUpdateInput
     }
 
     /**
@@ -6333,8 +6753,24 @@ declare namespace SourcegraphGQL {
     interface IDiscussionThreadTargetRepoInput {
         /**
          * The repository in which the thread was created.
+         *
+         * One of 'repositoryID', 'repositoryGitCloneURL', or 'repositoryName' must be specified.
          */
-        repository: string
+        repositoryID?: string | null
+
+        /**
+         * The repository in which the thread was created.
+         *
+         * One of 'repositoryID', 'repositoryGitCloneURL', or 'repositoryName' must be specified.
+         */
+        repositoryName?: string | null
+
+        /**
+         * The repository in which the thread was created.
+         *
+         * One of 'repositoryID', 'repositoryGitCloneURL', or 'repositoryName' must be specified.
+         */
+        repositoryGitCloneURL?: string | null
 
         /**
          * The path (relative to the repository root) of the file or directory that
@@ -6396,7 +6832,7 @@ declare namespace SourcegraphGQL {
          * the DiscussionThreadTargetRepoInput specified an invalid path or
          * branch/revision.
          */
-        linesBefore: Array<string>
+        linesBefore?: Array<string> | null
 
         /**
          * The literal textual (UTF-8) lines of the selection. i.e. all lines
@@ -6407,7 +6843,7 @@ declare namespace SourcegraphGQL {
          * the DiscussionThreadTargetRepoInput specified an invalid path or
          * branch/revision.
          */
-        lines: Array<string>
+        lines?: Array<string> | null
 
         /**
          * The literal textual (UTF-8) lines after the line the selection ended on.
@@ -6419,7 +6855,7 @@ declare namespace SourcegraphGQL {
          * the DiscussionThreadTargetRepoInput specified an invalid path or
          * branch/revision.
          */
-        linesAfter: Array<string>
+        linesAfter?: Array<string> | null
     }
 
     /**
@@ -6441,6 +6877,37 @@ declare namespace SourcegraphGQL {
          * can perform this action.
          */
         Delete?: boolean | null
+    }
+
+    /**
+     * Describes an update mutation to an existing comment in a thread.
+     */
+    interface IDiscussionCommentUpdateInput {
+        /**
+         * The ID of the comment to update.
+         */
+        commentID: string
+
+        /**
+         * When non-null, indicates that the thread should be deleted. Only admins
+         * can perform this action.
+         */
+        delete?: boolean | null
+
+        /**
+         * When non-null, reports the comment with the specified reason.
+         *
+         * An error will be returned if the comment's canReport field is false.
+         */
+        report?: string | null
+
+        /**
+         * When non-null, indicates that the reports on the thread should be
+         * cleared. Only admins can perform this action.
+         *
+         * An error will be returned if the comment's canClearReports field is false.
+         */
+        clearReports?: boolean | null
     }
 
     /**
@@ -6591,6 +7058,200 @@ declare namespace SourcegraphGQL {
          * The newly updated extension.
          */
         extension: IRegistryExtension
+    }
+
+    /**
+     * Mutations that are only used on Sourcegraph.com.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IDotcomMutation {
+        __typename: 'DotcomMutation'
+
+        /**
+         * Set or unset a user's associated billing information.
+         *
+         * Only Sourcegraph.com site admins may perform this mutation.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        setUserBilling: IEmptyResponse
+
+        /**
+         * Creates new product subscription for an account.
+         *
+         * Only Sourcegraph.com site admins may perform this mutation.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        createProductSubscription: IProductSubscription
+
+        /**
+         * Set or unset a product subscription's associated billing system subscription.
+         *
+         * Only Sourcegraph.com site admins may perform this mutation.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        setProductSubscriptionBilling: IEmptyResponse
+
+        /**
+         * Generates and signs a new product license and associates it with an existing product subscription. The
+         * product license key is signed with Sourcegraph.com's private key and is verifiable with the corresponding
+         * public key.
+         *
+         * Only Sourcegraph.com site admins may perform this mutation.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        generateProductLicenseForSubscription: IProductLicense
+
+        /**
+         * Creates a new product subscription and bills the associated payment method.
+         *
+         * Only Sourcegraph.com authenticated users may perform this mutation.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        createPaidProductSubscription: ICreatePaidProductSubscriptionResult
+
+        /**
+         * Archives an existing product subscription.
+         *
+         * Only Sourcegraph.com site admins may perform this mutation.
+         *
+         * FOR INTERNAL USE ONLY.
+         */
+        archiveProductSubscription: IEmptyResponse
+    }
+
+    interface ISetUserBillingOnDotcomMutationArguments {
+        /**
+         * The user to update.
+         */
+        user: string
+
+        /**
+         * The billing customer ID (on the billing system) to associate this user with. If null, the association is
+         * removed (i.e., the user is unlinked from the billing customer record).
+         */
+        billingCustomerID?: string | null
+    }
+
+    interface ICreateProductSubscriptionOnDotcomMutationArguments {
+        /**
+         * The ID of the user (i.e., customer) to whom this product subscription is assigned.
+         */
+        accountID: string
+    }
+
+    interface ISetProductSubscriptionBillingOnDotcomMutationArguments {
+        /**
+         * The product subscription to update.
+         */
+        id: string
+
+        /**
+         * The billing subscription ID (on the billing system) to associate this product subscription with. If null,
+         * the association is removed (i.e., the subscription is unlinked from billing).
+         */
+        billingSubscriptionID?: string | null
+    }
+
+    interface IGenerateProductLicenseForSubscriptionOnDotcomMutationArguments {
+        /**
+         * The product subscription to associate with the license.
+         */
+        productSubscriptionID: string
+
+        /**
+         * The license to generate.
+         */
+        license: IProductLicenseInput
+    }
+
+    interface ICreatePaidProductSubscriptionOnDotcomMutationArguments {
+        /**
+         * The ID of the user (i.e., customer) to whom the product subscription is assigned.
+         *
+         * Only Sourcegraph.com site admins may perform this mutation for an accountID != the user ID of the
+         * authenticated user.
+         */
+        accountID: string
+
+        /**
+         * The details of the product subscription.
+         */
+        productSubscription: IProductSubscriptionInput
+
+        /**
+         * The token that represents the payment method used to purchase this product subscription.
+         */
+        paymentToken: string
+    }
+
+    interface IArchiveProductSubscriptionOnDotcomMutationArguments {
+        id: string
+    }
+
+    /**
+     * An input type that describes a product license to be generated and signed.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IProductLicenseInput {
+        /**
+         * The tags that indicate which features are activated by this license.
+         */
+        tags: Array<string>
+
+        /**
+         * The number of users for which this product subscription is valid.
+         */
+        userCount: number
+
+        /**
+         * The expiration date of this product license, expressed as the number of seconds since the epoch.
+         */
+        expiresAt: number
+    }
+
+    /**
+     * An input type that describes a product subscription to be purchased.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface IProductSubscriptionInput {
+        /**
+         * The name of the subscription's plan (ProductPlan.name).
+         */
+        plan: string
+
+        /**
+         * This subscription's user count.
+         */
+        userCount: number
+
+        /**
+         * The non-authoritative price (in USD cents) that the client computed. The server MUST independently compute
+         * the price given this input object's other properties. If the prices differ (which indicates a bug or a
+         * malicious client), then the server MUST abort and return an error.
+         */
+        totalPriceNonAuthoritative: number
+    }
+
+    /**
+     * The result of Mutation.dotcom.createPaidProductSubscription.
+     *
+     * FOR INTERNAL USE ONLY.
+     */
+    interface ICreatePaidProductSubscriptionResult {
+        __typename: 'CreatePaidProductSubscriptionResult'
+
+        /**
+         * The newly created product subscription.
+         */
+        productSubscription: IProductSubscription
     }
 
     /**
