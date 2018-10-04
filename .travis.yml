@@ -5,15 +5,13 @@ env:
   global:
     - FORCE_COLOR=1
 
-cache:
-  directories:
-    - ~/.npm
+cache: yarn
 
 script:
-  - npm run prettier
-  - npm run build
+  - yarn run prettier
+  - yarn run build
 
 deploy:
   - provider: script
     skip_cleanup: true
-    script: npm run semantic-release
+    script: yarn run semantic-release
