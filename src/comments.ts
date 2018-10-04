@@ -24,6 +24,9 @@ class CommentProvider implements vscode.DocumentCommentProvider {
             log.appendLine(`provideDocumentComments ${e}`)
         }
 
+        // commentingRanges are the ranges where the user can create a new comment.
+        // For now, this is the entire document. In the future we may wish to limit this
+        // in certain ways (e.g. not comment on lines which don't blame to a git revision that has been pushed to a remote).
         const lastLine = document.lineCount - 1
         const commentingRanges = [new vscode.Range(0, 0, lastLine, document.lineAt(lastLine).range.end.character)]
 
@@ -57,7 +60,7 @@ class CommentProvider implements vscode.DocumentCommentProvider {
 async function provideDocumentComments(document: vscode.TextDocument): Promise<vscode.CommentThread[]> {
     log.appendLine(`provideDocumentComments ${document.uri}`)
     const [remoteUrl, branch, path] = await repoInfo(document.fileName)
-    if (remoteUrl === '') {
+    if (!remoteUrl) {
         throw new Error('Git repository has no remote url configured')
     }
     const data = await queryGraphQL(
@@ -96,6 +99,9 @@ async function provideDocumentComments(document: vscode.TextDocument): Promise<v
 
     const threads: vscode.CommentThread[] = []
     for (const thread of data.discussionThreads.nodes) {
+        if (thread.target.__typename !== 'DiscussionThreadTargetRepo') {
+            continue
+        }
         // TODO: this assumes there is no diff between the document state and the revision
         const sel = thread.target.relativeSelection
         if (sel) {
@@ -114,22 +120,20 @@ async function createNewCommentThread(
 ): Promise<vscode.CommentThread> {
     log.appendLine(`createNewCommentThread ${document.uri} ${range}`)
     const [remoteUrl, branch, path] = await repoInfo(document.fileName)
-    if (remoteUrl === '') {
+    if (!remoteUrl) {
         throw new Error('Git repository has no remote url configured')
     }
 
     const selection = getSelection(document, range)
-
-    const targetRepo: SourcegraphGQL.IDiscussionThreadTargetRepoInput = {
-        repositoryGitCloneURL: remoteUrl,
-        path,
-        branch,
-        selection,
-    }
     const input: SourcegraphGQL.IDiscussionThreadCreateInput = {
         title: text,
         contents: text,
-        targetRepo,
+        targetRepo: {
+            repositoryGitCloneURL: remoteUrl,
+            path,
+            branch,
+            selection,
+        },
     }
 
     const data = await mutateGraphQL(
@@ -185,15 +189,13 @@ function discussionToCommentThread(
     range: vscode.Range,
     thread: SourcegraphGQL.IDiscussionThread
 ): vscode.CommentThread {
-    const comments: vscode.Comment[] = []
-    for (const comment of thread.comments.nodes) {
-        comments.push({
-            commentId: comment.id,
-            body: new vscode.MarkdownString(comment.contents),
-            userName: comment.author.displayName || comment.author.username, // only username?
-            gravatar: comment.author.avatarURL || '',
-        })
-    }
+    const comments = thread.comments.nodes.map(comment => ({
+        commentId: comment.id,
+        body: new vscode.MarkdownString(comment.contents),
+        userName: comment.author.username,
+        gravatar: comment.author.avatarURL || '',
+    }))
+
     return {
         threadId: thread.id,
         resource: document.uri,

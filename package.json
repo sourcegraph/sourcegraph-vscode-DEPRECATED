@@ -57,7 +57,7 @@
         },
         "sourcegraph.accessToken": {
           "type": "string",
-          "description": "An access token for your account on the Sourcegraph instance configured in `sourcegraph.url`."
+          "description": "An access token for your account on the Sourcegraph instance configured in `sourcegraph.url`. You do not need to provide an access token unless you have `\"sourcegraph.discussionsPreviewEnabled\": true` in your settings."
         },
         "sourcegraph.discussionsPreviewEnabled": {
           "type": "boolean",
