@@ -61,7 +61,7 @@
         },
         "sourcegraph.discussionsPreviewEnabled": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Enables Sourcegraph discussions (preview)"
         }
       }
