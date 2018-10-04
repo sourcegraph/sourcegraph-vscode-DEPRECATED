@@ -98,7 +98,7 @@
     "watch": "tsc -w -p .",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "test": "node ./node_modules/vscode/bin/test",
-    "graphql": "get-graphql-schema https://sourcegraph.com/.api/graphql --json | gql2ts -n SourcegraphGQL -o src/typings/SourcegraphGQL.d.ts"
+    "graphql": "get-graphql-schema https://sourcegraph.com/.api/graphql --json | gql2ts -n SourcegraphGQL -o src/typings/SourcegraphGQL.d.ts && prettier src/typings/SourcegraphGQL.d.ts --write"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",
