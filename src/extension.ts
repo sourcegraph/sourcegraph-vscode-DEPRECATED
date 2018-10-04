@@ -1,5 +1,6 @@
 import opn from 'opn'
 import * as vscode from 'vscode'
+import { activateComments } from './comments'
 import { getSourcegraphUrl } from './config'
 import { repoInfo } from './git'
 
@@ -82,6 +83,7 @@ export function activate(context: vscode.ExtensionContext): void {
     // Register our extension commands (see package.json).
     context.subscriptions.push(vscode.commands.registerCommand('extension.open', handleCommandErrors(openCommand)))
     context.subscriptions.push(vscode.commands.registerCommand('extension.search', handleCommandErrors(searchCommand)))
+    activateComments(context)
 }
 
 export function deactivate(): void {

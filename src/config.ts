@@ -7,3 +7,7 @@ export function getSourcegraphUrl(): string {
     }
     return url
 }
+
+export function getAccessToken(): string | undefined {
+    return vscode.workspace.getConfiguration('sourcegraph').get<string>('accessToken')
+}
