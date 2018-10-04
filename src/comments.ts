@@ -68,6 +68,7 @@ async function provideDocumentComments(document: vscode.TextDocument): Promise<v
                 $relativeRev: String!
             ) {
                 discussionThreads(
+                    first: 10000
                     targetRepositoryGitCloneURL: $targetRepositoryGitCloneURL
                     targetRepositoryPath: $targetRepositoryPath
                 ) {
