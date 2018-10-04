@@ -4,6 +4,10 @@ import { gql, mutateGraphQL, queryGraphQL } from './graphql'
 import { log } from './log'
 
 export function activateComments(context: vscode.ExtensionContext): void {
+    if (!vscode.workspace.getConfiguration('sourcegraph').get<string>('discussionsPreviewEnabled')) {
+        return
+    }
+    log.appendLine('Discussions preview is enabled')
     const commentProvider = new CommentProvider()
     context.subscriptions.push(vscode.workspace.registerDocumentCommentProvider(commentProvider))
 }

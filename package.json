@@ -51,17 +51,18 @@
       "title": "Sourcegraph extension configuration",
       "properties": {
         "sourcegraph.url": {
-          "type": [
-            "string"
-          ],
+          "type": "string",
           "default": "https://sourcegraph.com",
           "description": "The base URL of the Sourcegraph instance to use."
         },
         "sourcegraph.accessToken": {
-          "type": [
-            "string"
-          ],
+          "type": "string",
           "description": "An access token for your account on the Sourcegraph instance configured in `sourcegraph.url`."
+        },
+        "sourcegraph.discussionsPreviewEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables Sourcegraph discussions (preview)"
         }
       }
     }
