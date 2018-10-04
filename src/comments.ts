@@ -56,16 +56,19 @@ class CommentProvider implements vscode.DocumentCommentProvider {
 
 async function provideDocumentComments(document: vscode.TextDocument): Promise<vscode.CommentThread[]> {
     log.appendLine(`provideDocumentComments ${document.uri}`)
-    const [remoteUrl, branch, targetRepositoryPath] = await repoInfo(document.fileName)
+    const [remoteUrl, branch, path] = await repoInfo(document.fileName)
     if (remoteUrl === '') {
         throw new Error('Git repository has no remote url configured')
     }
-    const targetRepositoryID = await getRepositoryId(remoteUrl)
     const data = await queryGraphQL(
         gql`
-            query DiscussionThreads($targetRepositoryID: ID!, $targetRepositoryPath: String!, $branch: String!) {
+            query DiscussionThreads(
+                $targetRepositoryGitCloneURL: String!
+                $targetRepositoryPath: String!
+                $relativeRev: String!
+            ) {
                 discussionThreads(
-                    targetRepositoryID: $targetRepositoryID
+                    targetRepositoryGitCloneURL: $targetRepositoryGitCloneURL
                     targetRepositoryPath: $targetRepositoryPath
                 ) {
                     totalCount
@@ -80,9 +83,9 @@ async function provideDocumentComments(document: vscode.TextDocument): Promise<v
             ${discussionThreadFieldsFragment}
         `,
         {
-            targetRepositoryID,
-            targetRepositoryPath,
-            branch,
+            targetRepositoryGitCloneURL: remoteUrl,
+            targetRepositoryPath: path,
+            relativeRev: branch,
         }
     )
 
@@ -114,10 +117,10 @@ async function createNewCommentThread(
         throw new Error('Git repository has no remote url configured')
     }
 
-    const repository = await getRepositoryId(remoteUrl)
     const selection = getSelection(document, range)
+
     const targetRepo: SourcegraphGQL.IDiscussionThreadTargetRepoInput = {
-        repository,
+        repositoryGitCloneURL: remoteUrl,
         path,
         branch,
         selection,
@@ -130,7 +133,7 @@ async function createNewCommentThread(
 
     const data = await mutateGraphQL(
         gql`
-            mutation CreateThread($input: DiscussionThreadCreateInput!, $branch: String!) {
+            mutation CreateThread($input: DiscussionThreadCreateInput!, $relativeRev: String!) {
                 discussions {
                     createThread(input: $input) {
                         ...DiscussionThreadFields
@@ -139,7 +142,7 @@ async function createNewCommentThread(
             }
             ${discussionThreadFieldsFragment}
         `,
-        { input, branch }
+        { input, relativeRev: branch }
     )
 
     if (!data.discussions || !data.discussions.createThread) {
@@ -158,7 +161,7 @@ async function replyToCommentThread(
     const [, branch] = await repoInfo(document.fileName)
     const data = await mutateGraphQL(
         gql`
-            mutation AddCommentToThread($threadID: ID!, $contents: String!, $branch: String!) {
+            mutation AddCommentToThread($threadID: ID!, $contents: String!, $relativeRev: String!) {
                 discussions {
                     addCommentToThread(threadID: $threadID, contents: $contents) {
                         ...DiscussionThreadFields
@@ -167,7 +170,7 @@ async function replyToCommentThread(
             }
             ${discussionThreadFieldsFragment}
         `,
-        { threadID: thread.threadId, contents: text, branch }
+        { threadID: thread.threadId, contents: text, relativeRev: branch }
     )
 
     if (!data.discussions || !data.discussions.addCommentToThread) {
@@ -196,40 +199,6 @@ function discussionToCommentThread(
         range,
         comments,
     }
-}
-
-async function getRepositoryId(remoteUrl: string): Promise<string> {
-    const name = parseRepository(remoteUrl)
-    if (!name) {
-        // TODO: fallback to Sourcegraph.com in the event that we are configured to a private instance?
-        throw new Error(`Repository does not exist on the configured Sourcegraph instance`)
-    }
-    const data = await queryGraphQL(
-        gql`
-            query GetRepositoryId($name: String) {
-                repository(name: $name) {
-                    id
-                }
-            }
-        `,
-        { name }
-    )
-    if (!data.repository || !data.repository.id) {
-        throw new Error(`Invalid GraphQL response for GetRepositoryId`)
-    }
-    return data.repository.id
-}
-
-function parseRepository(remoteUrl: string): string {
-    const schemeIndex = remoteUrl.indexOf('://')
-    if (schemeIndex >= 0) {
-        return remoteUrl.slice(schemeIndex + 3)
-    }
-    const parts = remoteUrl.match(/.*@([^:]+):(.+)/)
-    if (parts) {
-        return parts[1] + '/' + parts[2]
-    }
-    throw new Error(`Unknown git remote url format: ${remoteUrl}`)
 }
 
 function getSelection(
@@ -289,7 +258,7 @@ const discussionThreadFieldsFragment = gql`
                     name
                 }
                 path
-                relativePath(rev: $branch)
+                relativePath(rev: $relativeRev)
                 branch {
                     displayName
                 }
@@ -305,7 +274,7 @@ const discussionThreadFieldsFragment = gql`
                     lines
                     linesAfter
                 }
-                relativeSelection(rev: $branch) {
+                relativeSelection(rev: $relativeRev) {
                     startLine
                     startCharacter
                     endLine
