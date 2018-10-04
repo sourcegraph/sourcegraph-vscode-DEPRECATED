@@ -2,16 +2,16 @@ language: node_js
 node_js: '10'
 
 env:
-    global:
-        - FORCE_COLOR=1
+  global:
+    - FORCE_COLOR=1
 
 cache: yarn
 
 script:
-    - yarn run prettier
-    - yarn run build
+  - yarn run prettier
+  - yarn run build
 
 deploy:
-    - provider: script
-      skip_cleanup: true
-      script: yarn run semantic-release
+  - provider: script
+    skip_cleanup: true
+    script: yarn run semantic-release
