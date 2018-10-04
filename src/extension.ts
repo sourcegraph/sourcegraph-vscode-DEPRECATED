@@ -35,7 +35,7 @@ async function openCommand(): Promise<void> {
 
     // Open in browser.
     await opn(
-        `${getSourcegraphUrl()}-/editor` +
+        `${getSourcegraphUrl()}/-/editor` +
             `?remote_url=${encodeURIComponent(remoteURL)}` +
             `&branch=${encodeURIComponent(branch)}` +
             `&file=${encodeURIComponent(fileRel)}` +
@@ -65,7 +65,7 @@ async function searchCommand(): Promise<void> {
 
     // Search in browser.
     await opn(
-        `${getSourcegraphUrl()}-/editor` +
+        `${getSourcegraphUrl()}/-/editor` +
             `?remote_url=${encodeURIComponent(remoteURL)}` +
             `&branch=${encodeURIComponent(branch)}` +
             `&file=${encodeURIComponent(fileRel)}` +
