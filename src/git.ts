@@ -69,6 +69,9 @@ export async function repoInfo(filePath: string): Promise<[string, string, strin
         fileRel = filePath.slice(repoRoot.length + 1)
         remoteURL = await gitDefaultRemoteURL(repoRoot)
         branch = await gitBranch(repoRoot)
+        if (process.platform === 'win32') {
+            fileRel = fileRel.replace(/\\/g, '/')
+        }
     } catch (e) {
         log.appendLine(`repoInfo(${filePath}): ${e}`)
     }
