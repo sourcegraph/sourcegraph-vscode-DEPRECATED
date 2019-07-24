@@ -1,6 +1,7 @@
 import execa from 'execa'
 import * as path from 'path'
 import { log } from './log'
+import { getIgnoreRemoteHostname, getRemoteUrlPrepend } from './config'
 
 /**
  * Returns the names of all git remotes, e.g. ["origin", "foobar"]
@@ -16,7 +17,19 @@ async function gitRemotes(repoDir: string): Promise<string[]> {
  */
 async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string> {
     const { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDir })
-    return stdout
+    if (!getIgnoreRemoteHostname()) {
+        return stdout
+    }
+    const split = stdout.split(':')
+    if (split.length == 1) {
+        return split[0]
+    }
+    const remoteHostname = split[0]
+    const prepend = getRemoteUrlPrepend()[remoteHostname]
+    if (prepend) {
+        return `${prepend}${split[1]}`
+    }
+    return split[1]
 }
 
 /**

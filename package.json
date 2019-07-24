@@ -11,7 +11,7 @@
     "url": "https://github.com/sourcegraph/sourcegraph-vscode.git"
   },
   "engines": {
-    "vscode": "^1.11.0"
+    "vscode": "^1.12.0"
   },
   "categories": [
     "Other"
@@ -56,6 +56,20 @@
           ],
           "default": "https://sourcegraph.com",
           "description": "The base URL of the Sourcegraph instance to use."
+        },
+        "sourcegraph.ignoreRemoteHostname": {
+          "type": [
+            "boolean"
+          ],
+          "default": false,
+          "description": "Strip the hostname from remote names for git-based repos, useful for self-hosted sourcegraph. For example, if this is true git@git.company.com:repo will become just repo when opening a file."
+        },
+        "sourcegraph.remoteUrlPrepend": {
+          "type": [
+            "object"
+          ],
+          "default": {},
+          "description": "Prepend to the remote Url based on the hostname. Takes a map of string->string, if the remote url matches the key, the value is prepended to the remote Url. Requires ignoreRemoteHostname to be true. For example, if the remote is git@othergit.company.com:repo, and this setting is {\"git@othergit.company.com\": \"othergit/\"}, the repo will become othergit/repo."
         }
       }
     }

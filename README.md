@@ -25,6 +25,8 @@ Keyboard Shortcuts:
 This extension contributes the following settings:
 
 - `sourcegraph.url`: The Sourcegraph instance to use. Specify your on-premises Sourcegraph instance here, if applicable.
+- `sourcegraph.ignoreRemoteHostname`: Strip the hostname from remote names for git-based repos, useful for self-hosted sourcegraph. For example, if this is true git@git.company.com:repo will become just repo when opening a file. Defaults to `false`.
+- `sourcegraph.remoteUrlPrepend`: Prepend to the remote Url based on the hostname. Takes an object of string->string, if the remote url matches the key, the value is prepended to the remote url. Requires `ignoreRemoteHostname` to be `true`. For example, if the remote is `git@othergit.company.com:repo`, and this setting is `{"git@othergit.company.com": "othergit/"}`, the repo will become `othergit/repo`. Defaults to an empty object
 
 ## Questions & Feedback
 
