@@ -2,17 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "identifier": "watch",
       "type": "npm",
-      "script": "watch",
-      "problemMatcher": ["$tsc-watch"],
-      "isBackground": true
+      "script": "eslint",
+      "problemMatcher": ["$eslint-stylish"],
+      "presentation": {
+        "reveal": "never",
+      },
     },
-    {
-      "identifier": "build",
-      "type": "npm",
-      "script": "build",
-      "problemMatcher": ["$tsc"]
-    }
-  ]
+  ],
 }
