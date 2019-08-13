@@ -90,37 +90,37 @@
     ]
   },
   "scripts": {
-    "commitmsg": "commitlint -e $GIT_PARAMS",
     "semantic-release": "semantic-release",
-    "prettier": "prettier \"**/*.{ts,js,json,md}\" --list-different --write",
-    "tslint": "tslint \"src/**.ts\" --project tsconfig.json --config tslint.json",
+    "prettier": "prettier \"**/*.{ts,js,json,md,yml}\" --list-different --write",
+    "prettier-check": "npm run prettier -- --write=false",
+    "eslint": "eslint 'src/**/*.ts'",
     "build": "tsc -p .",
-    "watch": "tsc -w -p .",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test"
+    "watch": "tsc -w -p ."
   },
   "devDependencies": {
-    "@commitlint/cli": "^7.0.0",
-    "@commitlint/config-conventional": "^7.0.1",
-    "@sourcegraph/prettierrc": "^2.2.0",
-    "@sourcegraph/tsconfig": "^3.0.0",
-    "@sourcegraph/tslint-config": "^11.1.1",
-    "@types/execa": "^0.9.0",
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^10.3.3",
-    "@types/opn": "^5.1.0",
-    "husky": "^0.14.3",
-    "mocha": "^5.2.0",
-    "prettier": "1.13.7",
-    "semantic-release": "^15.8.1",
-    "semantic-release-vsce": "^2.1.2",
-    "tslint": "^5.10.0",
-    "typescript": "^2.0.3",
-    "vsce": "^1.42.0",
-    "vscode": "^1.1.21"
+    "@commitlint/cli": "^8.1.0",
+    "@commitlint/config-conventional": "^8.1.0",
+    "@sourcegraph/eslint-config": "^0.0.6",
+    "@sourcegraph/prettierrc": "^3.0.1",
+    "@sourcegraph/tsconfig": "^4.0.0",
+    "@types/execa": "2.0.0",
+    "@types/node": "12.7.1",
+    "@types/vscode": "1.37.0",
+    "eslint": "^6.1.0",
+    "husky": "^3.0.3",
+    "prettier": "^1.18.2",
+    "semantic-release": "^15.13.19",
+    "semantic-release-vsce": "^2.2.8",
+    "typescript": "^3.5.3",
+    "vsce": "^1.42.0"
   },
   "dependencies": {
-    "execa": "^0.6.3",
-    "opn": "^5.0.0"
+    "execa": "^2.0.3",
+    "open": "^6.4.0"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
+    }
   }
 }
