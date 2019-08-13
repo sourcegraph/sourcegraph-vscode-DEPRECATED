@@ -1,22 +1,25 @@
-import opn from 'opn'
+import open from 'open'
 import * as vscode from 'vscode'
 import { getSourcegraphUrl } from './config'
 import { repoInfo } from './git'
 
-const VERSION = require('../package.json').version
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+const { version } = require('../package.json')
 
 /**
  * Displays an error message to the user.
  */
-function showError(err: Error): void {
-    vscode.window.showErrorMessage(err.message)
+async function showError(err: Error): Promise<void> {
+    await vscode.window.showErrorMessage(err.message)
 }
 
-const handleCommandErrors = (command: (...args: any[]) => any) => async (...args: any[]) => {
+const handleCommandErrors = <P extends unknown[], R>(command: (...args: P) => Promise<R>) => async (
+    ...args: P
+): Promise<R | void> => {
     try {
         return await command(...args)
     } catch (error) {
-        showError(error)
+        await showError(error)
     }
 }
 
@@ -34,13 +37,13 @@ async function openCommand(): Promise<void> {
     }
 
     // Open in browser.
-    await opn(
+    await open(
         `${getSourcegraphUrl()}/-/editor` +
             `?remote_url=${encodeURIComponent(remoteURL)}` +
             `&branch=${encodeURIComponent(branch)}` +
             `&file=${encodeURIComponent(fileRel)}` +
             `&editor=${encodeURIComponent('VSCode')}` +
-            `&version=${encodeURIComponent(VERSION)}` +
+            `&version=${encodeURIComponent(version)}` +
             `&start_row=${encodeURIComponent(String(editor.selection.start.line))}` +
             `&start_col=${encodeURIComponent(String(editor.selection.start.character))}` +
             `&end_row=${encodeURIComponent(String(editor.selection.end.line))}` +
@@ -64,13 +67,13 @@ async function searchCommand(): Promise<void> {
     }
 
     // Search in browser.
-    await opn(
+    await open(
         `${getSourcegraphUrl()}/-/editor` +
             `?remote_url=${encodeURIComponent(remoteURL)}` +
             `&branch=${encodeURIComponent(branch)}` +
             `&file=${encodeURIComponent(fileRel)}` +
             `&editor=${encodeURIComponent('VSCode')}` +
-            `&version=${encodeURIComponent(VERSION)}` +
+            `&version=${encodeURIComponent(version)}` +
             `&search=${encodeURIComponent(query)}`
     )
 }
