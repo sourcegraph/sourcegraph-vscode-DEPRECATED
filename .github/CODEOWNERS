@@ -6,3 +6,7 @@
 # precedence.
 
 * @sourcegraph/code-nav 
+
+# Configured with renovate.json
+package.json
+yarn.lock
