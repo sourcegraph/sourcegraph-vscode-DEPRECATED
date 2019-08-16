@@ -16,15 +16,16 @@ async function gitRemotes(repoDir: string): Promise<string[]> {
  * e.g. `origin` -> `git@github.com:foo/bar`
  */
 async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string> {
-    const { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDir })
+    let { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDir })
     const replacementsList = getRemoteUrlReplacements()
-    var remote = stdout
 
-    for (let r in replacementsList) {
-        remote = remote.replace(r, replacementsList[r])
+    for (const r in replacementsList) {
+        if (typeof r === 'string') {
+            stdout = stdout.replace(r, replacementsList[r])
+        }
     }
 
-    return remote
+    return stdout
 }
 
 /**
