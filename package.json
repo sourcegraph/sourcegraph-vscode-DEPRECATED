@@ -97,7 +97,7 @@
     "@sourcegraph/prettierrc": "^3.0.1",
     "@sourcegraph/tsconfig": "^4.0.0",
     "@types/execa": "2.0.0",
-    "@types/node": "12.7.8",
+    "@types/node": "12.7.9",
     "@types/vscode": "1.38.0",
     "eslint": "^6.5.1",
     "husky": "^3.0.3",
