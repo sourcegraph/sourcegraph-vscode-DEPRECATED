@@ -2,7 +2,7 @@
   "name": "sourcegraph",
   "displayName": "Sourcegraph",
   "description": "Sourcegraph for VS Code",
-  "version": "1.0.12",
+  "version": "1.0.16",
   "publisher": "sourcegraph",
   "license": "MIT",
   "icon": "images/logo.png",
@@ -11,7 +11,7 @@
     "url": "https://github.com/sourcegraph/sourcegraph-vscode.git"
   },
   "engines": {
-    "vscode": "^1.11.0"
+    "vscode": "^1.37.0"
   },
   "categories": [
     "Other"
@@ -56,6 +56,13 @@
           ],
           "default": "https://sourcegraph.com",
           "description": "The base URL of the Sourcegraph instance to use."
+        },
+        "sourcegraph.remoteUrlReplacements": {
+          "type": [
+            "object"
+          ],
+          "default": {},
+          "description": "For each item in this object, replace key with value in the remote url."
         }
       }
     }

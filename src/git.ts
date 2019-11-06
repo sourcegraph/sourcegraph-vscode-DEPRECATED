@@ -1,6 +1,7 @@
 import execa from 'execa'
 import * as path from 'path'
 import { log } from './log'
+import { getRemoteUrlReplacements } from './config'
 
 /**
  * Returns the names of all git remotes, e.g. ["origin", "foobar"]
@@ -15,7 +16,15 @@ async function gitRemotes(repoDir: string): Promise<string[]> {
  * e.g. `origin` -> `git@github.com:foo/bar`
  */
 async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string> {
-    const { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDir })
+    let { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDir })
+    const replacementsList = getRemoteUrlReplacements()
+
+    for (const r in replacementsList) {
+        if (typeof r === 'string') {
+            stdout = stdout.replace(r, replacementsList[r])
+        }
+    }
+
     return stdout
 }
 
