@@ -100,11 +100,11 @@
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
     "@commitlint/config-conventional": "^8.2.0",
-    "@sourcegraph/eslint-config": "^0.3.1",
+    "@sourcegraph/eslint-config": "^0.4.3",
     "@sourcegraph/prettierrc": "^3.0.1",
     "@sourcegraph/tsconfig": "^4.0.0",
     "@types/execa": "2.0.0",
-    "@types/node": "12.12.5",
+    "@types/node": "12.12.6",
     "@types/vscode": "1.39.0",
     "eslint": "^6.6.0",
     "husky": "^3.0.3",
