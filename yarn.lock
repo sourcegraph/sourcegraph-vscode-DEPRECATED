@@ -288,10 +288,10 @@
     into-stream "^4.0.0"
     lodash "^4.17.4"
 
-"@sourcegraph/eslint-config@^0.4.3":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@sourcegraph/eslint-config/-/eslint-config-0.4.3.tgz#f5f08bea2f7c75841813a30c5daeeb43f7f650bf"
-  integrity sha512-oBKurT2uajaazBdJv6iPUUpRJOcJZnIDY2U5AB/1UgxCxg4tm7IfRFPOZunhUriDsMgoXGhTsht/MNmjwz8Dqg==
+"@sourcegraph/eslint-config@^0.4.4":
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/@sourcegraph/eslint-config/-/eslint-config-0.4.4.tgz#4d59c2e559f26a4faa81bedf34f44d35939f2b7e"
+  integrity sha512-ogDdnCxi44qbN3D18qzZ2u4lgvaJZvrDqfc9tM5UbyCuNJJ9OyU6AXrO3qhk3u/DiC3lFb7QtZTTP9CLx8dLmg==
   dependencies:
     "@sourcegraph/prettierrc" "^3.0.1"
     "@typescript-eslint/eslint-plugin" "^2.4.0"
