@@ -100,7 +100,7 @@
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
     "@commitlint/config-conventional": "^8.2.0",
-    "@sourcegraph/eslint-config": "^0.4.3",
+    "@sourcegraph/eslint-config": "^0.4.4",
     "@sourcegraph/prettierrc": "^3.0.1",
     "@sourcegraph/tsconfig": "^4.0.0",
     "@types/execa": "2.0.0",
