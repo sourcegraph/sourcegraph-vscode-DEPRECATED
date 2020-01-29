@@ -101,7 +101,7 @@
     "@commitlint/cli": "^8.3.4",
     "@commitlint/config-conventional": "^8.3.4",
     "@sourcegraph/eslint-config": "^0.4.8",
-    "@sourcegraph/prettierrc": "^3.0.1",
+    "@sourcegraph/prettierrc": "^3.0.2",
     "@sourcegraph/tsconfig": "^4.0.0",
     "@types/execa": "2.0.0",
     "@types/node": "12.12.14",
