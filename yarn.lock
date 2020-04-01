@@ -316,10 +316,10 @@
   resolved "https://registry.yarnpkg.com/@sourcegraph/prettierrc/-/prettierrc-3.0.3.tgz#51bfa9b2588fe35121593fa877143e6373028289"
   integrity sha512-FQ1/Ued4I02R0JkrHHofDN163juVxUnPALzfxPZrDZUHv+c3jHjfZhmTHEz+Wd+g3b7MFk0fkj36nZSnvPyU8A==
 
-"@sourcegraph/tsconfig@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/@sourcegraph/tsconfig/-/tsconfig-4.0.0.tgz#dd2a406f90760bb789fd89fde4bd0a8d681f2767"
-  integrity sha512-jxrhKbek4yu1HUDpUhqR9hAGFiUgaJ9NIM+c8JEkAnvpW67ab1AUFWb82aSVfZWX1UVqfR84AMr7xP3E8LlL+A==
+"@sourcegraph/tsconfig@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@sourcegraph/tsconfig/-/tsconfig-4.0.1.tgz#5965ec41771d2ac5b23b6e0d919cee3e70485840"
+  integrity sha512-G/xsejsR84G5dj3kHJ7svKBo9E5tWl96rUHKP94Y2UDtA7BzUhAYbieM+b9ZUpIRt66h3+MlYbG5HK4UI2zDzw==
 
 "@types/eslint-visitor-keys@^1.0.0":
   version "1.0.0"
