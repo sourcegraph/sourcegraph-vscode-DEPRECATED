@@ -32,7 +32,6 @@ async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string
  * Returns the remote URL of the first Git remote found.
  */
 async function gitDefaultRemoteURL(repoDir: string): Promise<string> {
-
     let remote = getDefaultRemote();
 
     // if there is no default remote configured, retrieve remote to use via 'git remote' command
@@ -52,7 +51,7 @@ async function gitDefaultRemoteURL(repoDir: string): Promise<string> {
 
 /**
  * Returns the repository root directory for any directory within the
- * repositorcurrentRemotesy.
+ * repository.
  */
 async function gitRootDir(repoDir: string): Promise<string> {
     const { stdout } = await execa('git', ['rev-parse', '--show-toplevel'], { cwd: repoDir })
