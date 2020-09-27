@@ -26,6 +26,7 @@ This extension contributes the following settings:
 
 - `sourcegraph.url`: The Sourcegraph instance to use. Specify your on-premises Sourcegraph instance here, if applicable.
 - `sourcegraph.remoteUrlReplacements`: Object, where each `key` is replaced by `value` in the remote url.
+- `sourcegraph.defaultRemote`: An optional default remote to always use when opening Sourcegraph links.
 
 ## Questions & Feedback
 
