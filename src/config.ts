@@ -21,7 +21,5 @@ export function getRemoteUrlReplacements(): Record<string, string> {
 
 export function getDefaultRemote(): string | undefined {
     // has default value
-    return vscode.workspace
-        .getConfiguration('sourcegraph')
-        .get<string>('defaultRemote')
+    return vscode.workspace.getConfiguration('sourcegraph').get<string>('defaultRemote')
 }

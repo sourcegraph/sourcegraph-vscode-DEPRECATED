@@ -32,7 +32,7 @@ async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string
  * Returns the remote URL of the first Git remote found.
  */
 async function gitDefaultRemoteURL(repoDir: string): Promise<string> {
-    let remote = getDefaultRemote();
+    let remote = getDefaultRemote()
 
     // if there is no default remote configured, retrieve remote to use via 'git remote' command
     if (remote === undefined) {
