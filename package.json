@@ -63,6 +63,13 @@
           ],
           "default": {},
           "description": "For each item in this object, replace key with value in the remote url."
+        },
+        "sourcegraph.defaultRemote": {
+          "type": [
+            "string"
+          ],
+          "default": null,
+          "description": "The default git remote to use."
         }
       }
     }
