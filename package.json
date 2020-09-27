@@ -69,7 +69,7 @@
             "string"
           ],
           "default": null,
-          "description": "The default git remote to use. If null, will use the first remote returned from `git remote`"
+          "description": "The default git remote to use. If null, will use the first remote returned from `git remote`."
         }
       }
     }
