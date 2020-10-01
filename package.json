@@ -108,7 +108,7 @@
     "@types/vscode": "1.49.0",
     "eslint": "^7.10.0",
     "husky": "^3.0.3",
-    "prettier": "^2.1.1",
+    "prettier": "^2.1.2",
     "semantic-release": "^15.13.19",
     "semantic-release-vsce": "^2.2.8",
     "typescript": "^3.5.3",
