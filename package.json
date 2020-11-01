@@ -106,7 +106,7 @@
     "@types/execa": "2.0.0",
     "@types/node": "12.12.14",
     "@types/vscode": "1.49.0",
-    "eslint": "^7.10.0",
+    "eslint": "^7.12.1",
     "husky": "^3.0.3",
     "prettier": "^2.1.2",
     "semantic-release": "^15.13.19",
