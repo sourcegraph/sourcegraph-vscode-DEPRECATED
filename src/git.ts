@@ -4,6 +4,30 @@ import { log } from './log'
 import { getRemoteUrlReplacements } from './config'
 
 /**
+ * Returns [remote, upstream branch].
+ * Empty remote is returned if the upstream branch points to a local branch. 
+ * Empty upstream branch is returned if there is no upstream branch.
+ */
+async function gitRemoteBranch(repoDir: string): Promise<[string, string]> {
+    try {
+        const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD@{upstream}'], { cwd: repoDir })
+        const remoteAndBranch = stdout.split('/')
+        if (remoteAndBranch.length == 2) {
+            const [remote, branch] = remoteAndBranch
+            return [remote, branch]
+        } else if (remoteAndBranch.length == 1) {
+            // The upstream branch points to a local branch.
+            return ['', remoteAndBranch[0]]
+        } else {
+            return ['', '']
+        }
+    } catch (error) {
+        return ['', '']
+    }
+
+}
+
+/**
  * Returns the names of all git remotes, e.g. ["origin", "foobar"]
  */
 async function gitRemotes(repoDirectory: string): Promise<string[]> {
@@ -29,9 +53,16 @@ async function gitRemoteURL(repoDirectory: string, remoteName: string): Promise<
 }
 
 /**
- * Returns the remote URL of the first Git remote found.
+ * Returns the remote URL.
  */
 async function gitDefaultRemoteURL(repoDirectory: string): Promise<string> {
+    const [remote,] = await gitRemoteBranch(repoDirectory)
+    if (remote !== '') {
+        return await gitRemoteURL(repoDirectory, remote)
+    }
+
+    // If we cannot find the remote name deterministically, we use the first
+    // Git remote found.
     const remotes = await gitRemotes(repoDirectory)
     if (remotes.length === 0) {
         throw new Error('no configured git remotes')
@@ -52,12 +83,18 @@ async function gitRootDirectory(repoDirectory: string): Promise<string> {
 }
 
 /**
- * Returns either the current branch name of the repository OR in all
- * other cases (e.g. detached HEAD state), it returns "HEAD".
+ * Returns either the current remote branch name of the repository OR in all
+ * other cases (e.g. detached HEAD state, upstream branch points to a local
+ * branch), it returns "HEAD".
  */
 async function gitBranch(repoDirectory: string): Promise<string> {
-    const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoDirectory })
-    return stdout
+    const [origin, branch] = await gitRemoteBranch(repoDirectory)
+    if (origin !== '') {
+        // The remote branch exists.
+        return branch
+    } else {
+        return "HEAD"
+    }
 }
 
 /**
