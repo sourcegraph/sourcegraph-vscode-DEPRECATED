@@ -5,26 +5,25 @@ import { getRemoteUrlReplacements } from './config'
 
 /**
  * Returns [remote, upstream branch].
- * Empty remote is returned if the upstream branch points to a local branch. 
+ * Empty remote is returned if the upstream branch points to a local branch.
  * Empty upstream branch is returned if there is no upstream branch.
  */
 async function gitRemoteBranch(repoDir: string): Promise<[string, string]> {
     try {
         const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD@{upstream}'], { cwd: repoDir })
         const remoteAndBranch = stdout.split('/')
-        if (remoteAndBranch.length == 2) {
+        if (remoteAndBranch.length === 2) {
             const [remote, branch] = remoteAndBranch
             return [remote, branch]
-        } else if (remoteAndBranch.length == 1) {
+        }
+        if (remoteAndBranch.length === 1) {
             // The upstream branch points to a local branch.
             return ['', remoteAndBranch[0]]
-        } else {
-            return ['', '']
         }
+        return ['', '']
     } catch (error) {
         return ['', '']
     }
-
 }
 
 /**
@@ -56,7 +55,7 @@ async function gitRemoteURL(repoDirectory: string, remoteName: string): Promise<
  * Returns the remote URL.
  */
 async function gitDefaultRemoteURL(repoDirectory: string): Promise<string> {
-    const [remote,] = await gitRemoteBranch(repoDirectory)
+    const [remote] = await gitRemoteBranch(repoDirectory)
     if (remote !== '') {
         return await gitRemoteURL(repoDirectory, remote)
     }
@@ -92,9 +91,8 @@ async function gitBranch(repoDirectory: string): Promise<string> {
     if (origin !== '') {
         // The remote branch exists.
         return branch
-    } else {
-        return "HEAD"
     }
+    return 'HEAD'
 }
 
 /**
