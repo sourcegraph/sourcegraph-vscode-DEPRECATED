@@ -9,8 +9,8 @@ const { version } = require('../package.json')
 /**
  * Displays an error message to the user.
  */
-async function showError(err: Error): Promise<void> {
-    await vscode.window.showErrorMessage(err.message)
+async function showError(error: Error): Promise<void> {
+    await vscode.window.showErrorMessage(error.message)
 }
 
 const handleCommandErrors = <P extends unknown[], R>(command: (...args: P) => Promise<R>) => async (
@@ -31,7 +31,7 @@ async function openCommand(): Promise<void> {
     if (!editor) {
         throw new Error('No active editor')
     }
-    const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
+    const [remoteURL, branch, fileRelative] = await repoInfo(editor.document.uri.fsPath)
     if (remoteURL === '') {
         return
     }
@@ -41,7 +41,7 @@ async function openCommand(): Promise<void> {
         `${getSourcegraphUrl()}/-/editor` +
             `?remote_url=${encodeURIComponent(remoteURL)}` +
             `&branch=${encodeURIComponent(branch)}` +
-            `&file=${encodeURIComponent(fileRel)}` +
+            `&file=${encodeURIComponent(fileRelative)}` +
             `&editor=${encodeURIComponent('VSCode')}` +
             `&version=${encodeURIComponent(version)}` +
             `&start_row=${encodeURIComponent(String(editor.selection.start.line))}` +
@@ -59,7 +59,7 @@ async function searchCommand(): Promise<void> {
     if (!editor) {
         throw new Error('No active editor')
     }
-    const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
+    const [remoteURL, branch, fileRelative] = await repoInfo(editor.document.uri.fsPath)
 
     const query = editor.document.getText(editor.selection)
     if (query === '') {
@@ -71,7 +71,7 @@ async function searchCommand(): Promise<void> {
         `${getSourcegraphUrl()}/-/editor` +
             `?remote_url=${encodeURIComponent(remoteURL)}` +
             `&branch=${encodeURIComponent(branch)}` +
-            `&file=${encodeURIComponent(fileRel)}` +
+            `&file=${encodeURIComponent(fileRelative)}` +
             `&editor=${encodeURIComponent('VSCode')}` +
             `&version=${encodeURIComponent(version)}` +
             `&search=${encodeURIComponent(query)}`

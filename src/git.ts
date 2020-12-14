@@ -6,8 +6,8 @@ import { getRemoteUrlReplacements } from './config'
 /**
  * Returns the names of all git remotes, e.g. ["origin", "foobar"]
  */
-async function gitRemotes(repoDir: string): Promise<string[]> {
-    const { stdout } = await execa('git', ['remote'], { cwd: repoDir })
+async function gitRemotes(repoDirectory: string): Promise<string[]> {
+    const { stdout } = await execa('git', ['remote'], { cwd: repoDirectory })
     return stdout.split('\n')
 }
 
@@ -15,13 +15,13 @@ async function gitRemotes(repoDir: string): Promise<string[]> {
  * Returns the remote URL for the given remote name.
  * e.g. `origin` -> `git@github.com:foo/bar`
  */
-async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string> {
-    let { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDir })
+async function gitRemoteURL(repoDirectory: string, remoteName: string): Promise<string> {
+    let { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDirectory })
     const replacementsList = getRemoteUrlReplacements()
 
-    for (const r in replacementsList) {
-        if (typeof r === 'string') {
-            stdout = stdout.replace(r, replacementsList[r])
+    for (const replacement in replacementsList) {
+        if (typeof replacement === 'string') {
+            stdout = stdout.replace(replacement, replacementsList[replacement])
         }
     }
 
@@ -31,23 +31,23 @@ async function gitRemoteURL(repoDir: string, remoteName: string): Promise<string
 /**
  * Returns the remote URL of the first Git remote found.
  */
-async function gitDefaultRemoteURL(repoDir: string): Promise<string> {
-    const remotes = await gitRemotes(repoDir)
+async function gitDefaultRemoteURL(repoDirectory: string): Promise<string> {
+    const remotes = await gitRemotes(repoDirectory)
     if (remotes.length === 0) {
         throw new Error('no configured git remotes')
     }
     if (remotes.length > 1) {
         log.appendLine(`using first git remote: ${remotes[0]}`)
     }
-    return await gitRemoteURL(repoDir, remotes[0])
+    return gitRemoteURL(repoDirectory, remotes[0])
 }
 
 /**
  * Returns the repository root directory for any directory within the
  * repository.
  */
-async function gitRootDir(repoDir: string): Promise<string> {
-    const { stdout } = await execa('git', ['rev-parse', '--show-toplevel'], { cwd: repoDir })
+async function gitRootDirectory(repoDirectory: string): Promise<string> {
+    const { stdout } = await execa('git', ['rev-parse', '--show-toplevel'], { cwd: repoDirectory })
     return stdout
 }
 
@@ -55,8 +55,8 @@ async function gitRootDir(repoDir: string): Promise<string> {
  * Returns either the current branch name of the repository OR in all
  * other cases (e.g. detached HEAD state), it returns "HEAD".
  */
-async function gitBranch(repoDir: string): Promise<string> {
-    const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoDir })
+async function gitBranch(repoDirectory: string): Promise<string> {
+    const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoDirectory })
     return stdout
 }
 
@@ -68,22 +68,22 @@ async function gitBranch(repoDir: string): Promise<string> {
 export async function repoInfo(filePath: string): Promise<[string, string, string]> {
     let remoteURL = ''
     let branch = ''
-    let fileRel = ''
+    let fileRelative = ''
     try {
         // Determine repository root directory.
-        const fileDir = path.dirname(filePath)
-        const repoRoot = await gitRootDir(fileDir)
+        const fileDirectory = path.dirname(filePath)
+        const repoRoot = await gitRootDirectory(fileDirectory)
 
         // Determine file path, relative to repository root.
-        fileRel = filePath.slice(repoRoot.length + 1)
+        fileRelative = filePath.slice(repoRoot.length + 1)
         remoteURL = await gitDefaultRemoteURL(repoRoot)
         branch = await gitBranch(repoRoot)
         if (process.platform === 'win32') {
-            fileRel = fileRel.replace(/\\/g, '/')
+            fileRelative = fileRelative.replace(/\\/g, '/')
         }
-    } catch (e) {
-        log.appendLine(`repoInfo(${filePath}): ${e}`)
+    } catch (error) {
+        log.appendLine(`repoInfo(${filePath}): ${error as string}`)
     }
-    log.appendLine(`repoInfo(${filePath}): remoteURL="${remoteURL}" branch="${branch}" fileRel="${fileRel}"`)
-    return [remoteURL, branch, fileRel]
+    log.appendLine(`repoInfo(${filePath}): remoteURL="${remoteURL}" branch="${branch}" fileRel="${fileRelative}"`)
+    return [remoteURL, branch, fileRelative]
 }
