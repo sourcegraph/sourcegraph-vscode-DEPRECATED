@@ -115,7 +115,7 @@
     "vsce": "^1.42.0"
   },
   "dependencies": {
-    "execa": "^2.0.3",
+    "execa": "^2.1.0",
     "open": "^6.4.0"
   },
   "husky": {
