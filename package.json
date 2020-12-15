@@ -110,7 +110,7 @@
     "husky": "^4.3.5",
     "prettier": "^2.2.1",
     "semantic-release": "^15.13.19",
-    "semantic-release-vsce": "^2.2.8",
+    "semantic-release-vsce": "^3.0.1",
     "typescript": "^3.5.3",
     "vsce": "^1.42.0"
   },
