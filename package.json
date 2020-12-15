@@ -109,7 +109,7 @@
     "eslint": "^7.15.0",
     "husky": "^4.3.5",
     "prettier": "^2.2.1",
-    "semantic-release": "^15.13.19",
+    "semantic-release": "^17.0.0",
     "semantic-release-vsce": "^2.2.8",
     "typescript": "^3.5.3",
     "vsce": "^1.42.0"
