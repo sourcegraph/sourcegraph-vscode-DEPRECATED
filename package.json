@@ -116,7 +116,7 @@
   },
   "dependencies": {
     "execa": "^2.0.3",
-    "open": "^6.4.0"
+    "open": "^7.3.0"
   },
   "husky": {
     "hooks": {
