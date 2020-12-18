@@ -8,9 +8,9 @@ import { getRemoteUrlReplacements } from './config'
  * Empty remote is returned if the upstream branch points to a local branch.
  * Empty upstream branch is returned if there is no upstream branch.
  */
-async function gitRemoteBranch(repoDir: string): Promise<[string, string]> {
+async function gitRemoteBranch(repoDirectory: string): Promise<[string, string]> {
     try {
-        const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD@{upstream}'], { cwd: repoDir })
+        const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD@{upstream}'], { cwd: repoDirectory })
         const remoteAndBranch = stdout.split('/')
         if (remoteAndBranch.length === 2) {
             const [remote, branch] = remoteAndBranch
@@ -21,7 +21,7 @@ async function gitRemoteBranch(repoDir: string): Promise<[string, string]> {
             return ['', remoteAndBranch[0]]
         }
         return ['', '']
-    } catch (error) {
+    } catch {
         return ['', '']
     }
 }
@@ -57,7 +57,7 @@ async function gitRemoteURL(repoDirectory: string, remoteName: string): Promise<
 async function gitDefaultRemoteURL(repoDirectory: string): Promise<string> {
     const [remote] = await gitRemoteBranch(repoDirectory)
     if (remote !== '') {
-        return await gitRemoteURL(repoDirectory, remote)
+        return gitRemoteURL(repoDirectory, remote)
     }
 
     // If we cannot find the remote name deterministically, we use the first
