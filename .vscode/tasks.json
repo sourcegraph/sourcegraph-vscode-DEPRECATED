@@ -9,5 +9,10 @@
         "reveal": "never",
       },
     },
+    {
+      "type": "npm",
+      "script": "build",
+      "label": "build",
+    },
   ],
 }
