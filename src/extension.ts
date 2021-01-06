@@ -31,7 +31,7 @@ async function openCommand(): Promise<void> {
     if (!editor) {
         throw new Error('No active editor')
     }
-    const [remoteURL, branch, fileRelative] = await repoInfo(editor.document.uri.fsPath)
+    const { remoteURL, branch, fileRelative } = await repoInfo(editor.document.uri.fsPath)
     if (remoteURL === '') {
         return
     }
@@ -59,7 +59,7 @@ async function searchCommand(): Promise<void> {
     if (!editor) {
         throw new Error('No active editor')
     }
-    const [remoteURL, branch, fileRelative] = await repoInfo(editor.document.uri.fsPath)
+    const { remoteURL, branch, fileRelative } = await repoInfo(editor.document.uri.fsPath)
 
     const query = editor.document.getText(editor.selection)
     if (query === '') {
