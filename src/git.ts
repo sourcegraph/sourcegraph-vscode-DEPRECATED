@@ -127,4 +127,3 @@ export async function repoInfo(filePath: string): Promise<RepositoryInfo> {
     log.appendLine(`repoInfo(${filePath}): remoteURL="${remoteURL}" branch="${branch}" fileRel="${fileRelative}"`)
     return { remoteURL, branch, fileRelative }
 }
-
