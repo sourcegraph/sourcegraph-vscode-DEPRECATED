@@ -1,7 +1,7 @@
 .editorconfig
+.github/**
 .gitignore
 .prettierignore
-.travis.yml
 .vscode-test/**
 .vscode/**
 **/*.map
