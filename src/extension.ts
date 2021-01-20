@@ -31,10 +31,11 @@ async function openCommand(): Promise<void> {
     if (!editor) {
         throw new Error('No active editor')
     }
-    const [remoteURL, branch, fileRelative] = await repoInfo(editor.document.uri.fsPath)
-    if (remoteURL === '') {
+    const repositoryInfo = await repoInfo(editor.document.uri.fsPath)
+    if (!repositoryInfo) {
         return
     }
+    const { remoteURL, branch, fileRelative } = repositoryInfo
 
     // Open in browser.
     await open(
@@ -59,7 +60,11 @@ async function searchCommand(): Promise<void> {
     if (!editor) {
         throw new Error('No active editor')
     }
-    const [remoteURL, branch, fileRelative] = await repoInfo(editor.document.uri.fsPath)
+    const repositoryInfo = await repoInfo(editor.document.uri.fsPath)
+    if (!repositoryInfo) {
+        return
+    }
+    const { remoteURL, branch, fileRelative } = repositoryInfo
 
     const query = editor.document.getText(editor.selection)
     if (query === '') {
