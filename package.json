@@ -105,7 +105,7 @@
     "@sourcegraph/tsconfig": "^4.0.1",
     "@types/node": "12.12.14",
     "@types/vscode": "1.52.0",
-    "eslint": "^7.17.0",
+    "eslint": "^7.19.0",
     "husky": "^4.3.6",
     "prettier": "^2.2.1",
     "semantic-release": "^17.3.0",
