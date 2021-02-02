@@ -14,13 +14,13 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14.x'
-      - run: yarn
-      - run: yarn run prettier-check
-      - run: yarn run eslint
-      - run: yarn run build
+      - run: npm install
+      - run: npm run prettier-check
+      - run: npm run eslint
+      - run: npm run build
       - name: release
         if: github.repository_owner == 'sourcegraph' && github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
-        run: yarn run semantic-release
+        run: npm run semantic-release
