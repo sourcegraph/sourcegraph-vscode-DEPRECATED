@@ -28,12 +28,14 @@ async function gitRemoteURL(repoDirectory: string, remoteName: string): Promise<
     let { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDirectory })
     const replacementsList = getRemoteUrlReplacements()
 
+    const stdoutBefore = stdout
+
     for (const replacement in replacementsList) {
         if (typeof replacement === 'string') {
             stdout = stdout.replace(replacement, replacementsList[replacement])
         }
     }
-
+    log.appendLine(`${stdoutBefore} became ${stdout}`)
     return stdout
 }
 
@@ -62,15 +64,22 @@ async function gitRemoteNameAndBranch(repoDirectory: string): Promise<RemoteName
     let remoteName: string | undefined
     let branch = 'HEAD'
 
-    const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD@{upstream}'], { cwd: repoDirectory })
-    const remoteAndBranch = stdout.split('/')
+    try {
+        const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD@{upstream}'], { cwd: repoDirectory })
+        const remoteAndBranch = stdout.split('/')
 
-    if (remoteAndBranch.length === 1) {
-        // The upstream branch points to a local branch.
-        ;[remoteName] = remoteAndBranch
-    }
-    if (remoteAndBranch.length === 2) {
-        ;[remoteName, branch] = remoteAndBranch
+        // TODO(tj): can't the remote have a slash as well?
+
+        if (remoteAndBranch.length === 1) {
+            // The upstream branch points to a local branch.
+            ;[remoteName] = remoteAndBranch
+        }
+        if (remoteAndBranch.length >= 2) {
+            ;[remoteName] = remoteAndBranch
+            branch = stdout.slice(remoteName.length + 1) // remove '/' from start of branch
+        }
+    } catch {
+        // noop. upstream may not be set
     }
 
     // If we cannot find the remote name deterministically, we use the first
