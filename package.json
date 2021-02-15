@@ -95,7 +95,13 @@
     "prettier-check": "npm run prettier -- --write=false",
     "eslint": "eslint 'src/**/*.ts'",
     "build": "tsc -p .",
-    "watch": "tsc -w -p ."
+    "watch": "tsc -w -p .",
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' mocha --require ts-node/register --require source-map-support/register --package package.json src/**/*.test.ts"
+  },
+  "mocha": {
+    "recursive": true,
+    "timeout": 200,
+    "watch-extensions": ["ts"]
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
@@ -114,8 +120,11 @@
     "vsce": "^1.81.1"
   },
   "dependencies": {
+    "@types/mocha": "^8.2.0",
     "execa": "^5.0.0",
-    "open": "^7.3.0"
+    "mocha": "^8.3.0",
+    "open": "^7.3.0",
+    "ts-node": "^9.1.1"
   },
   "husky": {
     "hooks": {

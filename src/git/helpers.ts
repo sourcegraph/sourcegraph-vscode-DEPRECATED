@@ -19,6 +19,15 @@ export const gitHelpers = {
     },
 
     /**
+     * Returns the remote URL for the given remote name.
+     * e.g. `origin` -> `git@github.com:foo/bar`
+     */
+    async remoteUrl(remoteName: string, repoDirectory: string): Promise<string> {
+        const { stdout } = await execa('git', ['remote', 'get-url', remoteName], { cwd: repoDirectory })
+        return stdout
+    },
+
+    /**
      * Returns either the current branch name of the repository OR in all
      * other cases (e.g. detached HEAD state), it returns "HEAD".
      */

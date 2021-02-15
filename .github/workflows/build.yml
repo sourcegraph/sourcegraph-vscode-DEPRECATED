@@ -18,6 +18,7 @@ jobs:
       - run: npm run prettier-check
       - run: npm run eslint
       - run: npm run build
+      - run: npm run test
       - name: release
         if: github.repository_owner == 'sourcegraph' && github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:
