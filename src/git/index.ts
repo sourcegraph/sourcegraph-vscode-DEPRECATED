@@ -51,35 +51,25 @@ async function gitRemoteNameAndBranch(
     git: Pick<GitHelpers, 'branch' | 'remotes' | 'upstreamAndBranch'>
 ): Promise<RemoteName & Branch> {
     let remoteName: string | undefined
-    let branch = 'HEAD'
 
     // Used to determine which part of upstreamAndBranch is the remote name, or as fallback if no upstream is set
     const remotes = await git.remotes(repoDirectory)
+    const branch = await git.branch(repoDirectory)
 
     try {
         const upstreamAndBranch = await git.upstreamAndBranch(repoDirectory)
-
-        // Longest prefix match out of remotes to determine where to split $UPSTREAM_REMOTE/$BRANCH_NAME.
+        // Subtract $BRANCH_NAME from $UPSTREAM_REMOTE/$BRANCH_NAME.
         // We can't just split on the delineating `/`, since refnames can include `/`:
         // https://sourcegraph.com/github.com/git/git@454cb6bd52a4de614a3633e4f547af03d5c3b640/-/blob/refs.c#L52-67
 
         // Example:
-        // remotes: ['remote', 'remote/two', 'otherremote']
         // stdout: remote/two/tj/feature
         // remoteName: remote/two, branch: tj/feature
 
-        let indexOfBranch = 0
-        for (const remote of remotes) {
-            if (upstreamAndBranch.startsWith(remote)) {
-                indexOfBranch = Math.max(remote.length + 1, indexOfBranch)
-            }
-        }
-
-        const maybeRemote = upstreamAndBranch.slice(0, indexOfBranch - 1)
-        const maybeBranch = upstreamAndBranch.slice(indexOfBranch)
-        if (maybeRemote && maybeBranch) {
+        const branchPosition = upstreamAndBranch.lastIndexOf(branch)
+        const maybeRemote = upstreamAndBranch.slice(0, branchPosition - 1)
+        if (maybeRemote) {
             remoteName = maybeRemote
-            branch = maybeBranch
         }
     } catch {
         // noop. upstream may not be set
@@ -92,7 +82,6 @@ async function gitRemoteNameAndBranch(
             log.appendLine(`no upstream found, using first git remote: ${remotes[0]}`)
         }
         remoteName = remotes[0]
-        branch = await git.branch(repoDirectory)
     }
 
     // Throw if a remote still isn't found
@@ -124,8 +113,7 @@ export async function repoInfo(filePath: string): Promise<RepositoryInfo | undef
         // Determine file path relative to repository root.
         let fileRelative = filePath.slice(repoRoot.length + 1)
 
-        const remoteNameAndBranch = await gitRemoteNameAndBranch(repoRoot, gitHelpers)
-        const { branch, remoteName } = remoteNameAndBranch
+        const { branch, remoteName } = await gitRemoteNameAndBranch(repoRoot, gitHelpers)
         const remoteURL = await gitRemoteURL(repoRoot, remoteName)
 
         if (process.platform === 'win32') {
