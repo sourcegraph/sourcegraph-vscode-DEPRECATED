@@ -19,6 +19,8 @@ jobs:
       - run: npm run eslint
       - run: npm run build
       - run: npm run test
+      - run: yarn nyc report --reporter json
+      - run: 'bash <(curl -s https://codecov.io/bash)'
       - name: release
         if: github.repository_owner == 'sourcegraph' && github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:

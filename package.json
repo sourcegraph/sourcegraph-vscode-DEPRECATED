@@ -96,12 +96,28 @@
     "eslint": "eslint 'src/**/*.ts'",
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
-    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' mocha --require ts-node/register --require source-map-support/register --package package.json src/**/*.test.ts"
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc mocha --require source-map-support/register --package package.json src/**/*.test.ts"
+  },
+  "nyc": {
+    "require": "ts-node/register",
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.test.ts"
+    ],
+    "extension": [
+      ".ts"
+    ]
   },
   "mocha": {
     "recursive": true,
     "timeout": 200,
-    "watch-extensions": ["ts"]
+    "watch-extensions": [
+      "ts"
+    ],
+    "require": "ts-node/register",
+    "spec": "src/**/*.test.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
@@ -113,6 +129,7 @@
     "@types/vscode": "1.52.0",
     "eslint": "^7.19.0",
     "husky": "^4.3.6",
+    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "semantic-release": "^17.3.0",
     "semantic-release-vsce": "^3.0.1",
