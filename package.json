@@ -96,7 +96,7 @@
     "eslint": "eslint 'src/**/*.ts'",
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
-    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc mocha --require source-map-support/register --package package.json src/**/*.test.ts"
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc mocha --require source-map-support/register --package package.json"
   },
   "nyc": {
     "require": "ts-node/register",
