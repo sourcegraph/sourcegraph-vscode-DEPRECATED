@@ -95,7 +95,29 @@
     "prettier-check": "npm run prettier -- --write=false",
     "eslint": "eslint 'src/**/*.ts'",
     "build": "tsc -p .",
-    "watch": "tsc -w -p ."
+    "watch": "tsc -w -p .",
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc mocha --require source-map-support/register --package package.json"
+  },
+  "nyc": {
+    "require": "ts-node/register",
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.test.ts"
+    ],
+    "extension": [
+      ".ts"
+    ]
+  },
+  "mocha": {
+    "recursive": true,
+    "timeout": 200,
+    "watch-extensions": [
+      "ts"
+    ],
+    "require": "ts-node/register",
+    "spec": "src/**/*.test.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
@@ -107,6 +129,7 @@
     "@types/vscode": "1.52.0",
     "eslint": "^7.19.0",
     "husky": "^4.3.6",
+    "nyc": "^15.1.0",
     "prettier": "^2.2.1",
     "semantic-release": "^17.3.0",
     "semantic-release-vsce": "^3.0.1",
@@ -114,8 +137,11 @@
     "vsce": "^1.81.1"
   },
   "dependencies": {
+    "@types/mocha": "^8.2.0",
     "execa": "^5.0.0",
-    "open": "^7.3.0"
+    "mocha": "^8.3.0",
+    "open": "^7.3.0",
+    "ts-node": "^9.1.1"
   },
   "husky": {
     "hooks": {
