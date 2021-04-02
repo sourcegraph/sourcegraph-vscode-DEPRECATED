@@ -18,3 +18,11 @@ export function getRemoteUrlReplacements(): Record<string, string> {
         .get<Record<string, string>>('remoteUrlReplacements')!
     return replacements
 }
+
+export function getDefaultMasterChoice(): boolean {
+    // has default value
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const set_master = vscode.workspace.getConfiguration('sourcegraph').get<string>('defaultMasterBranch')!
+    
+    return set_master;
+}

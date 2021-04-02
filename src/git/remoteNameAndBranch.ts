@@ -1,4 +1,5 @@
 import { GitHelpers } from './helpers'
+import { getDefaultMasterChoice } from '../config'
 
 export interface RemoteName {
     /**
@@ -34,7 +35,7 @@ export async function gitRemoteNameAndBranch(
 
     // Used to determine which part of upstreamAndBranch is the remote name, or as fallback if no upstream is set
     const remotes = await git.remotes(repoDirectory)
-    const branch = await git.branch(repoDirectory)
+    const branch = getDefaultMasterChoice() ? "master" : await git.branch(repoDirectory);
 
     try {
         const upstreamAndBranch = await git.upstreamAndBranch(repoDirectory)
