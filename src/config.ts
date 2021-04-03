@@ -19,10 +19,10 @@ export function getRemoteUrlReplacements(): Record<string, string> {
     return replacements
 }
 
-export function getDefaultMasterChoice(): boolean {
+export function getDefaultBranch(): string {
     // has default value
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const set_master = vscode.workspace.getConfiguration('sourcegraph').get<string>('defaultMasterBranch')!
+    const branch = vscode.workspace.getConfiguration('sourcegraph').get<string>('defaultBranch')!
     
-    return set_master;
+    return branch
 }
