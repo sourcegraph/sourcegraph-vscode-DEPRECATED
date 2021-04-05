@@ -48,7 +48,7 @@ export async function gitRemoteNameAndBranch(
 
         const branchPosition = upstreamAndBranch.lastIndexOf(branch)
         const maybeRemote = upstreamAndBranch.slice(0, branchPosition - 1)
-        if (maybeRemote) {
+        if (branchPosition !== -1 && maybeRemote) {
             remoteName = maybeRemote
         }
     } catch {

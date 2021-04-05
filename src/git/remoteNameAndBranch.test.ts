@@ -69,7 +69,7 @@ describe('git', () => {
             )
 
             assert.strictEqual(remoteName, 'origin', 'incorrect remote name')
-            assert.strictEqual(branch, 'master', 'incorrect branch name')
+            assert.strictEqual(branch, 'feature', 'incorrect branch name')
         })
     })
 })
