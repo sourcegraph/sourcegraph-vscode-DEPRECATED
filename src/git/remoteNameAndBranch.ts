@@ -37,7 +37,7 @@ export async function gitRemoteNameAndBranch(
     const remotes = await git.remotes(repoDirectory)
     // Use default branch name
     const defaultBranch = getDefaultBranch()
-    const branch = defaultBranch ? defaultBranch : await git.branch(repoDirectory)
+    const branch = defaultBranch || await git.branch(repoDirectory)
 
     try {
         const upstreamAndBranch = await git.upstreamAndBranch(repoDirectory)
