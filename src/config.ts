@@ -22,7 +22,7 @@ export function getRemoteUrlReplacements(): Record<string, string> {
 export function getDefaultBranch(): string {
     // has default value
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const branch = vscode.workspace.getConfiguration('sourcegraph').get<string>('defaultBranch')!
+    const branch = vscode.workspace.getConfiguration('sourcegraph').get<string>('setDefaultBranch')!
     
     return branch
 }
