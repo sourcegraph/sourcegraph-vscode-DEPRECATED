@@ -27,7 +27,7 @@ This extension contributes the following settings:
 
 - `sourcegraph.url`: The Sourcegraph instance to use. Specify your on-premises Sourcegraph instance here, if applicable.
 - `sourcegraph.remoteUrlReplacements`: Object, where each `key` is replaced by `value` in the remote url.
-- `sourcegraph.setDefaultBranch`: String to set the name of the default branch. Always open files in the default branch.
+- `sourcegraph.defaultBranch`: String to set the name of the default branch. Always open files in the default branch.
 
 ## Questions & Feedback
 
