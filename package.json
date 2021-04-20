@@ -63,6 +63,13 @@
           ],
           "default": {},
           "description": "For each item in this object, replace key with value in the remote url."
+        },
+        "sourcegraph.defaultBranch": {
+          "type": [
+            "string"
+          ],
+          "default": "",
+          "description": "Always open files at this default branch."
         }
       }
     }
