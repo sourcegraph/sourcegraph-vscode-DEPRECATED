@@ -23,33 +23,49 @@ const handleCommandErrors = <P extends unknown[], R>(command: (...args: P) => Pr
     }
 }
 
-/**
- * The command implementation for opening a cursor selection on Sourcegraph.
- */
-async function openCommand(): Promise<void> {
+async function getUrlForSelection(): Promise<string> {
     const editor = vscode.window.activeTextEditor
     if (!editor) {
         throw new Error('No active editor')
     }
     const repositoryInfo = await repoInfo(editor.document.uri.fsPath)
     if (!repositoryInfo) {
-        return
+        throw new Error('No active repository')
     }
     const { remoteURL, branch, fileRelative } = repositoryInfo
 
-    // Open in browser.
-    await open(
+    return (
         `${getSourcegraphUrl()}/-/editor` +
-            `?remote_url=${encodeURIComponent(remoteURL)}` +
-            `&branch=${encodeURIComponent(branch)}` +
-            `&file=${encodeURIComponent(fileRelative)}` +
-            `&editor=${encodeURIComponent('VSCode')}` +
-            `&version=${encodeURIComponent(version)}` +
-            `&start_row=${encodeURIComponent(String(editor.selection.start.line))}` +
-            `&start_col=${encodeURIComponent(String(editor.selection.start.character))}` +
-            `&end_row=${encodeURIComponent(String(editor.selection.end.line))}` +
-            `&end_col=${encodeURIComponent(String(editor.selection.end.character))}`
+        `?remote_url=${encodeURIComponent(remoteURL)}` +
+        `&branch=${encodeURIComponent(branch)}` +
+        `&file=${encodeURIComponent(fileRelative)}` +
+        `&editor=${encodeURIComponent('VSCode')}` +
+        `&version=${encodeURIComponent(version)}` +
+        `&start_row=${encodeURIComponent(String(editor.selection.start.line))}` +
+        `&start_col=${encodeURIComponent(String(editor.selection.start.character))}` +
+        `&end_row=${encodeURIComponent(String(editor.selection.end.line))}` +
+        `&end_col=${encodeURIComponent(String(editor.selection.end.character))}`
     )
+}
+
+/**
+ * The command implementation for copying a URL for cursor selection to clipboard.
+ */
+async function copyLinkCommand(): Promise<void> {
+    const url = await getUrlForSelection()
+
+    // Copy URL to system clipboard.
+    return vscode.env.clipboard.writeText(url)
+}
+
+/**
+ * The command implementation for opening a cursor selection on Sourcegraph.
+ */
+async function openCommand(): Promise<void> {
+    const url = await getUrlForSelection()
+
+    // Open in browser.
+    await open(url)
 }
 
 /**
@@ -88,6 +104,7 @@ async function searchCommand(): Promise<void> {
  */
 export function activate(context: vscode.ExtensionContext): void {
     // Register our extension commands (see package.json).
+    context.subscriptions.push(vscode.commands.registerCommand('extension.copy', handleCommandErrors(copyLinkCommand)))
     context.subscriptions.push(vscode.commands.registerCommand('extension.open', handleCommandErrors(openCommand)))
     context.subscriptions.push(vscode.commands.registerCommand('extension.search', handleCommandErrors(searchCommand)))
 }

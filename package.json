@@ -17,12 +17,17 @@
     "Other"
   ],
   "activationEvents": [
+    "onCommand:extension.copy",
     "onCommand:extension.open",
     "onCommand:extension.search"
   ],
   "main": "./out/extension",
   "contributes": {
     "commands": [
+      {
+        "command": "extension.copy",
+        "title": "Sourcegraph: Copy link"
+      },
       {
         "command": "extension.open",
         "title": "Sourcegraph: Open"
