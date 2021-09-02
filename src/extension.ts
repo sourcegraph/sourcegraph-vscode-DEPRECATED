@@ -55,7 +55,9 @@ async function copyLinkCommand(): Promise<void> {
     const url = await getUrlForSelection()
 
     // Copy URL to system clipboard.
-    return vscode.env.clipboard.writeText(url)
+    await vscode.env.clipboard.writeText(url)
+    await vscode.window.showInformationMessage('Sourcegraph URL copied to clipboard.')
+    return
 }
 
 /**
