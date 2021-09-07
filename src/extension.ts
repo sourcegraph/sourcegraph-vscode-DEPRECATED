@@ -1,4 +1,5 @@
 import open from 'open'
+import copy from 'copy'
 import * as vscode from 'vscode'
 import { getSourcegraphUrl } from './config'
 import { repoInfo } from './git'
@@ -72,7 +73,7 @@ async function searchCommand(): Promise<void> {
     }
 
     // Search in browser.
-    await open(
+    await copy(
         `${getSourcegraphUrl()}/-/editor` +
             `?remote_url=${encodeURIComponent(remoteURL)}` +
             `&branch=${encodeURIComponent(branch)}` +
@@ -84,12 +85,41 @@ async function searchCommand(): Promise<void> {
 }
 
 /**
+ * The command implementation for copying a Sourcegraph page to a file.
+ */
+async function copyCommand(): Promise<void> {
+    const editor = vscode.window.activeTextEditor
+    if (!editor) {
+        throw new Error('No active editor')
+    }
+    const [remoteURL, branch, fileRel] = await repoInfo(editor.document.uri.fsPath)
+    if (remoteURL === '') {
+        return
+    }
+
+    // Open in browser.
+    (
+        `${getSourcegraphUrl()}/-/editor` +
+            `?remote_url=${encodeURIComponent(remoteURL)}` +
+            `&branch=${encodeURIComponent(branch)}` +
+            `&file=${encodeURIComponent(fileRel)}` +
+            `&editor=${encodeURIComponent('VSCode')}` +
+            `&version=${encodeURIComponent(version)}` +
+            `&start_row=${encodeURIComponent(String(editor.selection.start.line))}` +
+            `&start_col=${encodeURIComponent(String(editor.selection.start.character))}` +
+            `&end_row=${encodeURIComponent(String(editor.selection.end.line))}` +
+            `&end_col=${encodeURIComponent(String(editor.selection.end.character))}`
+    )
+}
+
+/**
  * Called when the extension is activated.
  */
 export function activate(context: vscode.ExtensionContext): void {
     // Register our extension commands (see package.json).
     context.subscriptions.push(vscode.commands.registerCommand('extension.open', handleCommandErrors(openCommand)))
     context.subscriptions.push(vscode.commands.registerCommand('extension.search', handleCommandErrors(searchCommand)))
+    context.subscriptions.push(vscode.commands.registerCommand('extension.copy', handleCommandErrors(copyCommand)))
 }
 
 export function deactivate(): void {
