@@ -22,7 +22,6 @@ Keyboard Shortcuts:
 | Search selection in Sourcegraph | <kbd>Option</kbd>+<kbd>S</kbd> | <kbd>Alt</kbd>+<kbd>S</kbd> |
 | Search on Sourcegraph           | <kbd>Option</kbd>+<kbd>Q</kbd> | <kbd>Alt</kbd>+<kbd>Q</kbd> |
 
-
 ## Extension Settings
 
 This extension contributes the following settings:
