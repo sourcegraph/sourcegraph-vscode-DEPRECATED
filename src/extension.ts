@@ -55,7 +55,7 @@ async function openCommand(): Promise<void> {
 /**
  * The command implementation for searching a cursor selection on Sourcegraph.
  */
-async function searchCommand(): Promise<void> {
+async function searchSelectionCommand(): Promise<void> {
     const editor = vscode.window.activeTextEditor
     if (!editor) {
         throw new Error('No active editor')
@@ -84,11 +84,27 @@ async function searchCommand(): Promise<void> {
 }
 
 /**
+ * The command implementation for searching on Sourcegraph.com
+ */
+
+async function searchCommand(): Promise<void> {
+    await vscode.window.showInputBox().then(value => {
+        if (!value) {
+            return
+        }
+        return open(`${getSourcegraphUrl()}/search?patternType=literal&q=${encodeURIComponent(value)}`)
+    })
+}
+
+/**
  * Called when the extension is activated.
  */
 export function activate(context: vscode.ExtensionContext): void {
     // Register our extension commands (see package.json).
     context.subscriptions.push(vscode.commands.registerCommand('extension.open', handleCommandErrors(openCommand)))
+    context.subscriptions.push(
+        vscode.commands.registerCommand('extension.search.selection', handleCommandErrors(searchSelectionCommand))
+    )
     context.subscriptions.push(vscode.commands.registerCommand('extension.search', handleCommandErrors(searchCommand)))
 }
 
