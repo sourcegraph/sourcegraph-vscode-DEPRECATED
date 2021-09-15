@@ -20,12 +20,14 @@ Keyboard Shortcuts:
 | ------------------------------- | ------------------------------ | --------------------------- |
 | Open file in Sourcegraph        | <kbd>Option</kbd>+<kbd>A</kbd> | <kbd>Alt</kbd>+<kbd>A</kbd> |
 | Search selection in Sourcegraph | <kbd>Option</kbd>+<kbd>S</kbd> | <kbd>Alt</kbd>+<kbd>S</kbd> |
+| Search on Sourcegraph           | <kbd>Option</kbd>+<kbd>Q</kbd> | <kbd>Alt</kbd>+<kbd>Q</kbd> |
+
 
 ## Extension Settings
 
 This extension contributes the following settings:
 
-- `sourcegraph.url`: The Sourcegraph instance to use. Specify your on-premises Sourcegraph instance here, if applicable.
+- `sourcegraph.url`: Specify your on-premises Sourcegraph instance here, if applicable. For example: `"sourcegraph.url": "https://sourcegraph.com"`
 - `sourcegraph.remoteUrlReplacements`: Object, where each `key` is replaced by `value` in the remote url.
 - `sourcegraph.defaultBranch`: String to set the name of the default branch. Always open files in the default branch.
 
