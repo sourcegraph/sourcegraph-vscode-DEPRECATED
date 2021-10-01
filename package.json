@@ -137,8 +137,8 @@
     "spec": "src/**/*.test.ts"
   },
   "devDependencies": {
-    "@commitlint/cli": "^13.1.0",
-    "@commitlint/config-conventional": "^13.1.0",
+    "@commitlint/cli": "^13.2.0",
+    "@commitlint/config-conventional": "^13.2.0",
     "@sourcegraph/eslint-config": "^0.23.0",
     "@sourcegraph/prettierrc": "^3.0.3",
     "@sourcegraph/tsconfig": "^4.0.1",
