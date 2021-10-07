@@ -2,14 +2,14 @@
   "extends": "@sourcegraph/tsconfig",
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es6",
+    "target": "es2019",
     "outDir": "out",
-    "lib": ["es6"],
+    "lib": ["es2019", "dom"],
     "sourceMap": true,
     "rootDir": "src",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "strict": true,
   },
-  "exclude": ["node_modules", ".vscode-test", "**/*.test.ts"],
+  "exclude": ["node_modules", ".vscode-test"],
 }

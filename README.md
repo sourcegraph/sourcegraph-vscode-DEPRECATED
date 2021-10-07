@@ -16,11 +16,12 @@ In the command palette (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> or <kbd>Ctr
 
 Keyboard Shortcuts:
 
-| Description                     | Mac                            | Linux / Windows             |
-| ------------------------------- | ------------------------------ | --------------------------- |
-| Open file in Sourcegraph        | <kbd>Option</kbd>+<kbd>A</kbd> | <kbd>Alt</kbd>+<kbd>A</kbd> |
-| Search selection in Sourcegraph | <kbd>Option</kbd>+<kbd>S</kbd> | <kbd>Alt</kbd>+<kbd>S</kbd> |
-| Search on Sourcegraph           | <kbd>Option</kbd>+<kbd>Q</kbd> | <kbd>Alt</kbd>+<kbd>Q</kbd> |
+| Description                              | Mac                            | Linux / Windows             |
+| ---------------------------------------- | ------------------------------ | --------------------------- |
+| Sourcegraph: Open file in browser        | <kbd>Option</kbd>+<kbd>A</kbd> | <kbd>Alt</kbd>+<kbd>A</kbd> |
+| Sourcegraph: Go to file in editor        | <kbd>Option</kbd>+<kbd>F</kbd> | <kbd>Alt</kbd>+<kbd>F</kbd> |
+| Sourcegraph: Go to repository in editor  | <kbd>Option</kbd>+<kbd>R</kbd> | <kbd>Alt</kbd>+<kbd>R</kbd> |
+| Sourcegraph: Search selection in browser | <kbd>Option</kbd>+<kbd>S</kbd> | <kbd>Alt</kbd>+<kbd>S</kbd> |
 
 ## Extension Settings
 
@@ -29,6 +30,8 @@ This extension contributes the following settings:
 - `sourcegraph.url`: Specify your on-premises Sourcegraph instance here, if applicable. For example: `"sourcegraph.url": "https://sourcegraph.com"`
 - `sourcegraph.remoteUrlReplacements`: Object, where each `key` is replaced by `value` in the remote url.
 - `sourcegraph.defaultBranch`: String to set the name of the default branch. Always open files in the default branch.
+- `sourcegraph.recentlyOpenFiles`: List of strings for recently visited files. This setting is automatically managed by the extension.
+- `sourcegraph.recentlyOpenRepositories`: List of strings for recently visited repositories. This setting is automatically managed by the extension.
 
 ## Questions & Feedback
 

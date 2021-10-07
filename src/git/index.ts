@@ -1,6 +1,7 @@
 import * as path from 'path'
 import { log } from '../log'
-import { getRemoteUrlReplacements, getDefaultBranch } from '../config'
+import { defaultBranchSetting } from '../settings/defaultBranchSetting'
+import { remoteUrlReplacementsSetting } from '../settings/remoteUrlReplacementsSetting'
 import { gitHelpers } from './helpers'
 import { Branch, gitRemoteNameAndBranch } from './remoteNameAndBranch'
 import { gitRemoteUrlWithReplacements } from './remoteUrl'
@@ -30,11 +31,11 @@ export async function repoInfo(filePath: string): Promise<RepositoryInfo | undef
         const remoteURL = await gitRemoteUrlWithReplacements(
             repoRoot,
             remoteName,
-            getRemoteUrlReplacements,
+            remoteUrlReplacementsSetting,
             gitHelpers,
             log
         )
-        branch = getDefaultBranch() || branch
+        branch = defaultBranchSetting() || branch
 
         if (process.platform === 'win32') {
             fileRelative = fileRelative.replace(/\\/g, '/')

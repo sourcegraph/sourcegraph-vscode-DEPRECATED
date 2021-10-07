@@ -11,22 +11,210 @@
     "url": "https://github.com/sourcegraph/sourcegraph-vscode.git"
   },
   "engines": {
-    "vscode": "^1.52.0"
+    "vscode": "^1.60.0"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [
+    "onNotebook:sourcegraph-notebook",
+    "onFileSystem:sourcegraph",
+    "onLanguage:sourcegraph",
+    "onView:sourcegraph",
+    "onCommand:extension.openFile",
+    "onCommand:extension.goToFile",
+    "onCommand:extension.goToRepository",
+    "onCommand:extension.newNotebook",
     "onCommand:extension.open",
     "onCommand:extension.search.selection",
     "onCommand:extension.search"
   ],
   "main": "./out/extension",
   "contributes": {
+    "notebookRenderer": [
+      {
+        "id": "sourcegraph-location-renderer",
+        "displayName": "Sourcegraph Location Renderer",
+        "mimeTypes": [
+          "application/sourcegraph-location"
+        ],
+        "entrypoint": "./src/search/SourcegraphLocationRenderer.js",
+        "requiresMessaging": "always"
+      }
+    ],
+    "notebooks": [
+      {
+        "type": "sourcegraph-notebook",
+        "displayName": "Sourcegraph Notebook",
+        "priority": "option",
+        "selector": [
+          {
+            "filenamePattern": "*.snb.{md,markdown}"
+          }
+        ]
+      }
+    ],
+    "languages": [
+      {
+        "id": "sourcegraph",
+        "aliases": [
+          "Sourcegraph Query",
+          "Sourcegraph",
+          "sourcegraph"
+        ],
+        "extensions": [
+          ".sourcegraph"
+        ],
+        "//": "TODO: experiment with adding an iconFont as mentioned here https://github.com/microsoft/vscode/issues/114942#issuecomment-773457375"
+      }
+    ],
+    "viewsWelcome": [
+      {
+        "view": "sourcegraph.commands",
+        "contents": "[New Search Notebook](command:extension.newNotebook)\n[Go to Repository](command:extension.goToRepository)"
+      },
+      {
+        "view": "sourcegraph.files",
+        "contents": "No open files."
+      },
+      {
+        "view": "sourcegraph.diffs",
+        "contents": "No open diffs."
+      }
+    ],
     "commands": [
       {
+        "command": "extension.goToCommit",
+        "category": "Sourcegraph",
+        "title": "Go to Commit",
+        "enablement": "a = b",
+        "//": "Always disabled because we only trigger it programmatically"
+      },
+      {
+        "command": "extension.goToFile",
+        "category": "Sourcegraph",
+        "title": "Go to File"
+      },
+      {
+        "command": "extension.goToFileInFolder",
+        "category": "Sourcegraph",
+        "title": "Go to File in Folder"
+      },
+      {
+        "command": "extension.goToRepository",
+        "category": "Sourcegraph",
+        "title": "Go to Repository"
+      },
+      {
+        "command": "extension.updateCompareRange",
+        "category": "Sourcegraph",
+        "title": "Update this git revision",
+        "icon": {
+          "dark": "icons/dark/edit.svg",
+          "light": "icons/light/edit.svg"
+        },
+        "enablement": "a == b",
+        "//": "Always disabled because users click on the item itself"
+      },
+      {
+        "command": "extension.switchGitRevision",
+        "category": "Sourcegraph",
+        "title": "View File at Git Revision",
+        "enablement": "resourceScheme == sourcegraph || focusedView == 'sourcegraph.files'"
+      },
+      {
+        "command": "extension.openFileInBrowser",
+        "category": "Sourcegraph",
+        "title": "Open File in Web Browser",
+        "enablement": "resourceScheme == sourcegraph || focusedView == 'sourcegraph.files'"
+      },
+      {
+        "command": "extension.green1",
+        "category": "Sourcegraph",
+        "title": "green1",
+        "icon": "icons/green-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.green2",
+        "category": "Sourcegraph",
+        "title": "green2",
+        "icon": "icons/green-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.green3",
+        "category": "Sourcegraph",
+        "title": "green3",
+        "icon": "icons/green-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.orange1",
+        "category": "Sourcegraph",
+        "title": "orange1",
+        "icon": "icons/orange-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.orange2",
+        "category": "Sourcegraph",
+        "title": "orange2",
+        "icon": "icons/orange-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.orange3",
+        "category": "Sourcegraph",
+        "title": "orange3",
+        "icon": "icons/orange-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.red1",
+        "category": "Sourcegraph",
+        "title": "red1",
+        "icon": "icons/red-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.red2",
+        "category": "Sourcegraph",
+        "title": "red2",
+        "icon": "icons/red-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.red3",
+        "category": "Sourcegraph",
+        "title": "red3",
+        "icon": "icons/red-square.svg",
+        "enablement": "a == b"
+      },
+      {
+        "command": "extension.newNotebook",
+        "category": "Sourcegraph",
+        "title": "New Search Notebook"
+      },
+      {
+        "command": "extension.focusActiveFile",
+        "category": "Sourcegraph",
+        "title": "Focus on Active File in Side Bar",
+        "icon": {
+          "light": "icons/focus-light.svg",
+          "dark": "icons/focus-dark.svg"
+        },
+        "enablement": "sourcegraph.canFocusActiveDocument"
+      },
+      {
+        "command": "extension.openFile",
+        "category": "Sourcegraph",
+        "title": "Open File"
+      },
+      {
         "command": "extension.open",
-        "title": "Sourcegraph: Open"
+        "category": "Sourcegraph",
+        "title": "Open"
       },
       {
         "command": "extension.search.selection",
@@ -34,9 +222,108 @@
       },
       {
         "command": "extension.search",
-        "title": "Sourcegraph: Search"
+        "category": "Sourcegraph",
+        "title": "Search"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sourcegraph-view",
+          "title": "Sourcegraph",
+          "icon": "images/logo.png"
+        }
+      ]
+    },
+    "views": {
+      "sourcegraph-view": [
+        {
+          "id": "sourcegraph.commands",
+          "name": "Commands"
+        },
+        {
+          "id": "sourcegraph.files",
+          "name": "Files"
+        },
+        {
+          "id": "sourcegraph.diffs",
+          "name": "Diffs"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "extension.focusActiveFile",
+          "group": "navigation",
+          "when": "view == sourcegraph.files"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "extension.goToFileInFolder",
+          "when": "view == sourcegraph.files && viewItem == directory"
+        },
+        {
+          "command": "extension.switchGitRevision",
+          "when": "view == sourcegraph.files && viewItem == file"
+        },
+        {
+          "command": "extension.openFileInBrowser",
+          "when": "view == sourcegraph.files && viewItem == file"
+        },
+        {
+          "command": "extension.updateCompareRange",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem == compareRange"
+        },
+        {
+          "command": "extension.green1",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /green1/"
+        },
+        {
+          "command": "extension.green2",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /green2/"
+        },
+        {
+          "command": "extension.green3",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /green3/"
+        },
+        {
+          "command": "extension.orange1",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /orange1/"
+        },
+        {
+          "command": "extension.orange2",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /orange2/"
+        },
+        {
+          "command": "extension.orange3",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /orange3/"
+        },
+        {
+          "command": "extension.red1",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /red1/"
+        },
+        {
+          "command": "extension.red2",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /red2/"
+        },
+        {
+          "command": "extension.red3",
+          "group": "inline",
+          "when": "view == sourcegraph.diffs && viewItem =~ /red3/"
+        }
+      ]
+    },
     "keybindings": [
       {
         "command": "extension.open",
@@ -45,7 +332,22 @@
         "when": "editorFocus"
       },
       {
-        "command": "extension.search.selection",
+        "command": "extension.goToFile",
+        "key": "alt+f",
+        "mac": "alt+f"
+      },
+      {
+        "command": "extension.goToRepository",
+        "key": "alt+r",
+        "mac": "alt+r"
+      },
+      {
+        "command": "extension.focusActiveFile",
+        "key": "alt+1",
+        "mac": "alt+1"
+      },
+      {
+        "command": "extension.search",
         "key": "alt+s",
         "mac": "alt+s",
         "when": "editorFocus"
@@ -57,29 +359,62 @@
       }
     ],
     "configuration": {
-      "type": "object",
-      "title": "Sourcegraph extension configuration",
+      "title": "Sourcegraph",
       "properties": {
         "sourcegraph.url": {
           "type": [
             "string"
           ],
           "default": "https://sourcegraph.com",
-          "description": "The base URL of the Sourcegraph instance to use."
+          "markdownDescription": "The base URL of the Sourcegraph instance to use."
+        },
+        "sourcegraph.accessToken": {
+          "type": [
+            "string"
+          ],
+          "default": "",
+          "markdownDescription": "The access token to query the Sourcegraph API. Create a new access token at https://sourcegraph.com/users/settings/tokens"
         },
         "sourcegraph.remoteUrlReplacements": {
           "type": [
             "object"
           ],
           "default": {},
-          "description": "For each item in this object, replace key with value in the remote url."
+          "markdownDescription": "For each item in this object, replace key with value in the remote url."
         },
         "sourcegraph.defaultBranch": {
           "type": [
             "string"
           ],
           "default": "",
-          "description": "Always open files at this default branch."
+          "markdownDescription": "Always open files at this default branch."
+        },
+        "sourcegraph.debug": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "If true, log detailed troubleshooting information to the Sourcegraph output channel."
+        },
+        "sourcegraph.recentlyOpenFiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "Files that have been opened through the 'Go to file' command"
+        },
+        "sourcegraph.recentlyOpenRepositories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              }
+            }
+          },
+          "markdownDescription": "Files that have been opened through the 'Go to repository' command"
         }
       }
     }
@@ -113,7 +448,8 @@
     "eslint": "eslint 'src/**/*.ts'",
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
-    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc mocha --require source-map-support/register --package package.json"
+    "editor-test": "node ./out/test/runTest.js",
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc mocha --require source-map-support/register --package package.json --exclude 'src/test/**/*.test.ts'"
   },
   "nyc": {
     "require": "ts-node/register",
@@ -139,12 +475,22 @@
   "devDependencies": {
     "@commitlint/cli": "^13.2.0",
     "@commitlint/config-conventional": "^13.2.0",
+    "@pollyjs/adapter-node-http": "^5.1.1",
+    "@pollyjs/core": "^5.1.1",
+    "@pollyjs/persister-fs": "^5.1.1",
     "@sourcegraph/eslint-config": "^0.23.0",
     "@sourcegraph/prettierrc": "^3.0.3",
     "@sourcegraph/tsconfig": "^4.0.1",
     "@types/node": "14.17.21",
-    "@types/vscode": "1.52.0",
+    "@types/pollyjs__adapter-node-http": "^2.0.1",
+    "@types/pollyjs__core": "^4.3.3",
+    "@types/pollyjs__persister-fs": "^2.0.1",
+    "@types/shelljs": "^0.8.9",
+    "@types/vscode": "1.60.0",
+    "@types/vscode-notebook-renderer": "^1.60.0",
+    "@vscode/test-electron": "^1.6.2",
     "eslint": "^7.32.0",
+    "glob": "^7.1.7",
     "husky": "^4.3.6",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
@@ -154,10 +500,15 @@
     "vsce": "^1.81.1"
   },
   "dependencies": {
-    "@types/mocha": "8.2.0",
+    "@types/mocha": "^9.0.0",
+    "date-fns": "^2.24.0",
     "execa": "^5.0.0",
-    "mocha": "^8.3.0",
+    "got": "^11.8.2",
+    "mocha": "^9.1.1",
+    "node-fetch": "^3.0.0",
     "open": "^7.4.2",
+    "shelljs": "^0.8.4",
+    "tagged-template-noop": "^2.1.1",
     "ts-node": "^9.1.1"
   },
   "husky": {
