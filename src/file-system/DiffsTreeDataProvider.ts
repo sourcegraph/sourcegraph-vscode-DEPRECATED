@@ -12,8 +12,6 @@ import { FileTree } from './FileTree'
 import { SourcegraphFileSystemProvider } from './SourcegraphFileSystemProvider'
 import { CompareRange, SourcegraphUri } from './SourcegraphUri'
 
-type DiffNodeKind = 'base' | 'head' | 'commits' | 'files'
-
 const DEFAULT_COMMIT_HISTORY_LENGTH = 10
 
 export class DiffsTreeDataProvider implements vscode.TreeDataProvider<string> {
@@ -309,6 +307,7 @@ export class DiffsTreeDataProvider implements vscode.TreeDataProvider<string> {
         }
     }
 }
+
 interface FileStats {
     tooltip: string
     contextValue: string
@@ -375,6 +374,7 @@ function fileDiffStats(
     }
 }
 
+type DiffNodeKind = 'base' | 'head' | 'commits' | 'files'
 interface DiffNodeOptionals {
     kind?: DiffNodeKind
     commit?: string
@@ -407,8 +407,7 @@ class DiffNode {
         try {
             return this.fromAny(JSON.parse(json))
         } catch (error) {
-            log.error(`DiffUri.parse(json=${json})`, error)
-            throw new Error(`DiffUri.parse(${json})`)
+            return log.errorAndThrow(`DiffUri.parse(json=${json})`, error)
         }
     }
     private static fromAny(any: any): DiffNode {

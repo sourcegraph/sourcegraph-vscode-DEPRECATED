@@ -22,6 +22,7 @@ import { DiffsTreeDataProvider } from './file-system/DiffsTreeDataProvider'
 import { updateCompareRange } from './commands/updateCompareRangeCommand'
 import { BlameDecorationProvider } from './file-system/BlameDecorationProvider'
 import { goToCommitCommand } from './commands/goToCommitCommand'
+import { activateEndpointSetting } from './settings/endpointSetting'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 export const { version } = require('../package.json')
@@ -45,6 +46,11 @@ const handleCommandErrors = <P extends unknown[], R>(what: string, command: (...
         }
     }
 }
+
+export const fs = new SourcegraphFileSystemProvider()
+export const files = new FilesTreeDataProvider(fs)
+export const diffs = new DiffsTreeDataProvider(fs)
+export const blames = new BlameDecorationProvider(fs)
 
 /**
  * Called when the extension is activated.
@@ -72,21 +78,18 @@ export function activate(context: vscode.ExtensionContext): void {
     )
 
     // Register file-system related functionality.
-    const fs = new SourcegraphFileSystemProvider()
-    const referenceProvider = new SourcegraphReferenceProvider(fs)
     vscode.workspace.registerFileSystemProvider('sourcegraph', fs, { isReadonly: true })
     vscode.languages.registerHoverProvider({ scheme: 'sourcegraph' }, new SourcegraphHoverProvider(fs))
     vscode.languages.registerDefinitionProvider({ scheme: 'sourcegraph' }, new SourcegraphDefinitionProvider(fs))
+    const referenceProvider = new SourcegraphReferenceProvider(fs)
     vscode.languages.registerReferenceProvider({ scheme: 'sourcegraph' }, referenceProvider)
 
-    const files = new FilesTreeDataProvider(fs)
     const filesTreeView = vscode.window.createTreeView<string>('sourcegraph.files', {
         treeDataProvider: files,
         showCollapseAll: true,
     })
     files.setTreeView(filesTreeView)
 
-    const diffs = new DiffsTreeDataProvider(fs)
     const diffsTreeView = vscode.window.createTreeView('sourcegraph.diffs', {
         treeDataProvider: diffs,
         showCollapseAll: true,
@@ -179,11 +182,9 @@ export function activate(context: vscode.ExtensionContext): void {
             () => {}
         )
     }
-    const blameDecorationProvider = new BlameDecorationProvider(fs)
+    context.subscriptions.push(activateEndpointSetting())
     context.subscriptions.push(
-        vscode.window.onDidChangeTextEditorSelection(event =>
-            blameDecorationProvider.onDidChangeTextEditorSelection(event)
-        )
+        vscode.window.onDidChangeTextEditorSelection(event => blames.onDidChangeTextEditorSelection(event))
     )
     context.subscriptions.push(
         vscode.commands.registerCommand('extension.goToCommit', (...commandArguments) =>

@@ -2,7 +2,7 @@ import { request, RequestOptions } from 'https'
 import { CancellationToken } from 'vscode'
 import { log } from '../log'
 import { debugEnabledSetting } from '../settings/debugEnabledSetting'
-import { endpointHostnameSetting, endpointSetting } from '../settings/endpointSetting'
+import { endpointPortSetting, endpointHostnameSetting, endpointSetting } from '../settings/endpointSetting'
 import {
     accessTokenSetting,
     deleteAccessTokenSetting,
@@ -37,7 +37,7 @@ export function graphqlQueryWithAccessToken<A, B>(
         }
         const options: RequestOptions = {
             hostname: endpointHostnameSetting(),
-            port: 443,
+            port: endpointPortSetting(),
             path: '/.api/graphql',
             method: 'POST',
             headers,

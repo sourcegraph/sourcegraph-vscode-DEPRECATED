@@ -9,6 +9,7 @@ import { resolveRevisionQuery } from '../queries/resolveRevisionQuery'
 export interface GoToCommitParameters {
     revision: string
     uri: string
+    filenameAtRevision: string | undefined
     line: number
 }
 
@@ -62,21 +63,16 @@ async function goToCommitCommandUnsafe(
         { base: revisionSpec1, head: revision2, first: 10000, repositoryId },
         token
     )
-    const diffsPromise2 = repositoryComparisonDiffQuery(
-        { base: revision2, head: uri3.revision, first: 10000, repositoryId },
-        token
-    )
     const revisionPromise1 = resolveRevisionQuery({ repositoryName, revision: revisionSpec1 }, token)
 
     const diffs1 = await diffsPromise1
-    const diffs2 = await diffsPromise2
     const revision1 = await revisionPromise1
 
     if (!revision1) {
         throw new Error('no revision1')
     }
-    const node2 = diffs2.files.find(file => file.newPath === uri3.path)
-    const path2 = node2?.oldPath || uri3.path
+    log.debug({ parameters })
+    const path2 = parameters.filenameAtRevision || uri3.path
     const node1 = diffs1.files.find(file => file.newPath === path2)
     const path1 = node1?.oldPath
 

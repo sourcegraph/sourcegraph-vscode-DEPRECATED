@@ -3,7 +3,7 @@ import { graphqlQuery } from './graphqlQuery'
 import gql from 'tagged-template-noop'
 
 export async function repositoriesQuery(query: string, token: vscode.CancellationToken): Promise<string[]> {
-    const result = await graphqlQuery<RepositoryParameters, RepositoryResult>(
+    const response = await graphqlQuery<RepositoryParameters, RepositoryResult>(
         gql`
             query RepositoriesForPopover($query: String, $first: Int) {
                 repositories(first: $first, query: $query) {
@@ -24,7 +24,7 @@ export async function repositoriesQuery(query: string, token: vscode.Cancellatio
         },
         token
     )
-    return result?.data?.repositories?.nodes?.filter(node => !node.isFork).map(node => node.name) || []
+    return response?.data?.repositories?.nodes?.filter(node => !node.isFork).map(node => node.name) || []
 }
 
 interface RepositoryParameters {

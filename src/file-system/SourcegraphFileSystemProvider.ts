@@ -119,7 +119,7 @@ export class SourcegraphFileSystemProvider implements vscode.FileSystemProvider 
         return [...this.fileNamesByRepository.keys()]
     }
 
-    public async allFileFromOpenRepositories(folder?: SourcegraphUri): Promise<RepositoryFileNames[]> {
+    public async allFilesFromOpenRepositories(folder?: SourcegraphUri): Promise<RepositoryFileNames[]> {
         const promises: RepositoryFileNames[] = []
         const folderRepositoryUri = folder?.repositoryUri()
         for (const [repositoryUri, downloadingFileNames] of this.fileNamesByRepository.entries()) {
@@ -170,9 +170,7 @@ export class SourcegraphFileSystemProvider implements vscode.FileSystemProvider 
         const token = emptyCancelationToken()
         const defaultBranch = (await this.repositoryMetadata(repositoryName, token))?.defaultBranch
         if (!defaultBranch) {
-            const message = `repository '${repositoryName}' has no default branch`
-            log.error(message)
-            throw new Error(message)
+            log.errorAndThrow(`repository '${repositoryName}' has no default branch`)
         }
         const uri = SourcegraphUri.fromParts(endpointHostnameSetting(), repositoryName, { revision: defaultBranch })
         const files = await this.downloadFiles(uri)
@@ -201,9 +199,7 @@ export class SourcegraphFileSystemProvider implements vscode.FileSystemProvider 
         await this.repositoryMetadata(uri.repositoryName)
         const token = emptyCancelationToken()
         if (!uri.revision) {
-            const error = `missing revision for URI '${uri.uri}'`
-            log.error(error)
-            throw new Error(error)
+            log.errorAndThrow(`missing revision for URI '${uri.uri}'`)
         }
         const path = uri.path || ''
         const content = await contents(
@@ -236,8 +232,7 @@ export class SourcegraphFileSystemProvider implements vscode.FileSystemProvider 
 
             return toCacheResult
         }
-        log.error(`fetchBlob(${uri.uri}) not found`)
-        throw new Error(`Not found '${uri.uri}'`)
+        return log.errorAndThrow(`fetchBlob(${uri.uri}) not found`)
     }
 
     public async repositoryMetadata(

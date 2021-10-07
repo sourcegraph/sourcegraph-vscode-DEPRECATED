@@ -8,7 +8,7 @@ export class FilesTreeDataProvider implements vscode.TreeDataProvider<string> {
         fs.onDidDownloadRepositoryFilenames(() => this.didChangeTreeData.fire(undefined))
     }
 
-    private isTreeViewVisible = false
+    private _isViewVisible = false
     private isExpandedNode = new Set<string>()
     private treeView: vscode.TreeView<string> | undefined
     private activeUri: vscode.Uri | undefined
@@ -22,11 +22,14 @@ export class FilesTreeDataProvider implements vscode.TreeDataProvider<string> {
             ? this.fs.sourcegraphUri(this.activeUri)
             : undefined
     }
+    public isViewVisible(): boolean {
+        return this._isViewVisible
+    }
     public setTreeView(treeView: vscode.TreeView<string>): void {
         this.treeView = treeView
         treeView.onDidChangeVisibility(event => {
-            const didBecomeVisible = !this.isTreeViewVisible && event.visible
-            this.isTreeViewVisible = event.visible
+            const didBecomeVisible = !this._isViewVisible && event.visible
+            this._isViewVisible = event.visible
             if (didBecomeVisible) {
                 // NOTE: do not remove the line below even if you think it
                 // doesn't have an effect. Before you remove this line, make
@@ -84,17 +87,13 @@ export class FilesTreeDataProvider implements vscode.TreeDataProvider<string> {
                     return child.path && uri.path?.startsWith(child.path + '/')
                 })
                 if (!ancestor) {
-                    log.error(`getParent(${uriString || 'undefined'}) nothing startsWith`)
-                    throw new Error('BOOM')
+                    log.errorAndThrow(`getParent(${uriString || 'undefined'}) nothing startsWith`)
                 }
                 children = await this.getChildren(ancestor)
             }
             return ancestor
         } catch (error) {
-            log.error(`getParent(${uriString || 'undefined'})`, error)
-            if (error instanceof Error) {
-                throw error
-            }
+            log.errorAndThrow(`getParent(${uriString || 'undefined'})`, error)
             return undefined
         }
     }
@@ -115,11 +114,7 @@ export class FilesTreeDataProvider implements vscode.TreeDataProvider<string> {
             }
             return directChildren
         } catch (error) {
-            log.error(`getChildren(${uriString || ''})`, error)
-            if (error instanceof Error) {
-                throw error
-            }
-            return undefined
+            return log.errorAndThrow(`getChildren(${uriString || ''})`, error)
         }
     }
 
@@ -129,7 +124,7 @@ export class FilesTreeDataProvider implements vscode.TreeDataProvider<string> {
     }
 
     public async didFocus(vscodeUri: vscode.Uri | undefined): Promise<void> {
-        // log.appendLine(`didFocus=${vscodeUri?.toString(true) || 'undefined'}`)
+        log.appendLine(`didFocus=${vscodeUri?.toString(true) || 'undefined'}`)
         this.didFocusToken.cancel()
         this.didFocusToken = new vscode.CancellationTokenSource()
         this.activeUri = vscodeUri
@@ -139,7 +134,7 @@ export class FilesTreeDataProvider implements vscode.TreeDataProvider<string> {
                 () => {},
                 () => {}
             )
-        if (vscodeUri && vscodeUri.scheme === 'sourcegraph' && this.treeView && this.isTreeViewVisible) {
+        if (vscodeUri && vscodeUri.scheme === 'sourcegraph' && this.treeView && this._isViewVisible) {
             const uri = this.fs.sourcegraphUri(vscodeUri)
             if (uri.uri === this.fs.emptyFileUri()) {
                 return
@@ -160,10 +155,7 @@ export class FilesTreeDataProvider implements vscode.TreeDataProvider<string> {
             const parentUri = await this.getParent(uri.uri)
             return this.newTreeItem(uri, parentUri ? SourcegraphUri.parse(parentUri) : undefined, 0)
         } catch (error) {
-            log.error(`getTreeItem(${uriString})`, error)
-            if (error instanceof Error) {
-                throw error
-            }
+            log.errorAndThrow(`getTreeItem(${uriString})`, error)
         }
         return {}
     }

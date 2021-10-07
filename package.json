@@ -448,7 +448,8 @@
     "eslint": "eslint 'src/**/*.ts'",
     "build": "tsc -p .",
     "watch": "tsc -w -p .",
-    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc mocha --require source-map-support/register --package package.json"
+    "editor-test": "node ./out/test/runTest.js",
+    "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc mocha --require source-map-support/register --package package.json --exclude 'src/test/**/*.test.ts'"
   },
   "nyc": {
     "require": "ts-node/register",
@@ -474,14 +475,22 @@
   "devDependencies": {
     "@commitlint/cli": "^13.2.0",
     "@commitlint/config-conventional": "^13.2.0",
+    "@pollyjs/adapter-node-http": "^5.1.1",
+    "@pollyjs/core": "^5.1.1",
+    "@pollyjs/persister-fs": "^5.1.1",
     "@sourcegraph/eslint-config": "^0.23.0",
     "@sourcegraph/prettierrc": "^3.0.3",
     "@sourcegraph/tsconfig": "^4.0.1",
     "@types/node": "14.17.21",
+    "@types/pollyjs__adapter-node-http": "^2.0.1",
+    "@types/pollyjs__core": "^4.3.3",
+    "@types/pollyjs__persister-fs": "^2.0.1",
     "@types/shelljs": "^0.8.9",
     "@types/vscode": "1.60.0",
     "@types/vscode-notebook-renderer": "^1.60.0",
+    "@vscode/test-electron": "^1.6.2",
     "eslint": "^7.32.0",
+    "glob": "^7.1.7",
     "husky": "^4.3.6",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
@@ -491,11 +500,11 @@
     "vsce": "^1.81.1"
   },
   "dependencies": {
-    "@types/mocha": "8.2.0",
+    "@types/mocha": "^9.0.0",
     "date-fns": "^2.24.0",
     "execa": "^5.0.0",
     "got": "^11.8.2",
-    "mocha": "^8.3.0",
+    "mocha": "^9.1.1",
     "node-fetch": "^3.0.0",
     "open": "^7.4.2",
     "shelljs": "^0.8.4",

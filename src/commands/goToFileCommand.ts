@@ -14,7 +14,7 @@ export async function goToFileCommand(fs: SourcegraphFileSystemProvider, folderU
     quick.pick.busy = true
     const folder = folderUri ? SourcegraphUri.parse(folderUri) : undefined
     const folderPath = folder?.path ? folder.path + '/' : undefined
-    fs.allFileFromOpenRepositories(folder).then(
+    fs.allFilesFromOpenRepositories(folder).then(
         allFiles => {
             for (const repo of allFiles) {
                 for (const file of repo.fileNames) {

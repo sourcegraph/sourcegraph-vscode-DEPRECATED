@@ -107,7 +107,12 @@ ${commit}${message}`)
         if (!blame?.commit?.abbreviatedOID || !blame?.commit?.oid) {
             return ''
         }
-        const parameters: GoToCommitParameters = { revision: blame.commit.oid, uri: uri.uri, line: selection.end.line }
+        const parameters: GoToCommitParameters = {
+            revision: blame.commit.oid,
+            uri: uri.uri,
+            line: selection.end.line,
+            filenameAtRevision: blame.filename,
+        }
         const encodedParameters = encodeURIComponent(JSON.stringify(parameters))
         return `[${blame.commit.abbreviatedOID}](command:extension.goToCommit?${encodedParameters} "Show Commit") • `
     }

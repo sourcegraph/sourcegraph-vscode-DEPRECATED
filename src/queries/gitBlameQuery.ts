@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { graphqlQuery } from './graphqlQuery'
 import gql from 'tagged-template-noop'
+import { endpointGraphQLSchema } from '../settings/endpointSetting'
 
 export async function gitBlameQuery(
     parameters: GitBlameParameters,
@@ -13,6 +14,7 @@ export async function gitBlameQuery(
                     commit(rev: $revision) {
                         blob(path: $filePath) {
                             blame(startLine: 0, endLine: 0) {
+                                ${(await endpointGraphQLSchema()).blameFilenameField}
                                 startLine
                                 endLine
                                 author {
@@ -44,6 +46,7 @@ export async function gitBlameQuery(
 }
 
 export interface GitBlame {
+    filename?: string // This field got added in the PR https://github.com/sourcegraph/sourcegraph/pull/25729
     startLine: number
     endLine: number
     author?: {
