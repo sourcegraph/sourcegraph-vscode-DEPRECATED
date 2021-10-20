@@ -5,7 +5,7 @@ import { gitHelpers } from './helpers'
 import { Branch, gitRemoteNameAndBranch } from './remoteNameAndBranch'
 import { gitRemoteUrlWithReplacements } from './remoteUrl'
 
-interface RepositoryInfo extends Branch {
+export interface RepositoryInfo extends Branch {
     /** Git repository remote URL */
     remoteURL: string
 

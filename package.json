@@ -18,6 +18,7 @@
   ],
   "activationEvents": [
     "onCommand:extension.open",
+    "onCommand:extension.copyUrl",
     "onCommand:extension.search.selection",
     "onCommand:extension.search"
   ],
@@ -27,6 +28,10 @@
       {
         "command": "extension.open",
         "title": "Sourcegraph: Open"
+      },
+      {
+        "command": "extension.copyUrl",
+        "title": "Sourcegraph: Copy Url"
       },
       {
         "command": "extension.search.selection",
@@ -73,6 +78,13 @@
           ],
           "default": {},
           "description": "For each item in this object, replace key with value in the remote url."
+        },
+        "sourcegraph.remoteRegexUrlReplacements": {
+          "type": [
+            "object"
+          ],
+          "default": {},
+          "description": "For each item in this object, replace RegEx key with value in the remote url."
         },
         "sourcegraph.defaultBranch": {
           "type": [
