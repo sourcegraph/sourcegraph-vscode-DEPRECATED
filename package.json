@@ -139,7 +139,7 @@
   "devDependencies": {
     "@commitlint/cli": "^13.2.0",
     "@commitlint/config-conventional": "^13.2.0",
-    "@sourcegraph/eslint-config": "^0.23.0",
+    "@sourcegraph/eslint-config": "^0.26.0",
     "@sourcegraph/prettierrc": "^3.0.3",
     "@sourcegraph/tsconfig": "^4.0.1",
     "@types/node": "16.11.26",
