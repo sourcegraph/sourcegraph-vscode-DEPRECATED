@@ -62,10 +62,20 @@ describe('git', () => {
             assert.strictEqual(branch, 'feature', 'incorrect branch name')
         })
 
-        it('falls back to first remote and branch when branch is not pushed to upstream', async () => {
+        it('falls back to first remote and upstream branch when branch does not match upstream', async () => {
             const { remoteName, branch } = await gitRemoteNameAndBranch(
                 '',
                 createMockGitHelpers(['origin'], 'feature', 'origin/master')
+            )
+
+            assert.strictEqual(remoteName, 'origin', 'incorrect remote name')
+            assert.strictEqual(branch, 'master', 'incorrect branch name')
+        })
+
+        it('falls back to first remote and branch when remote does not match upstream', async () => {
+            const { remoteName, branch } = await gitRemoteNameAndBranch(
+                '',
+                createMockGitHelpers(['origin'], 'feature', 'upstream/master')
             )
 
             assert.strictEqual(remoteName, 'origin', 'incorrect remote name')

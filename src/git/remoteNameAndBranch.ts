@@ -31,13 +31,15 @@ export async function gitRemoteNameAndBranch(
     }
 ): Promise<RemoteName & Branch> {
     let remoteName: string | undefined
+    let branch: string | undefined
+    let upstreamAndBranch: string | undefined
 
     // Used to determine which part of upstreamAndBranch is the remote name, or as fallback if no upstream is set
     const remotes = await git.remotes(repoDirectory)
-    const branch = await git.branch(repoDirectory)
+    branch = await git.branch(repoDirectory)
 
     try {
-        const upstreamAndBranch = await git.upstreamAndBranch(repoDirectory)
+        upstreamAndBranch = await git.upstreamAndBranch(repoDirectory)
         // Subtract $BRANCH_NAME from $UPSTREAM_REMOTE/$BRANCH_NAME.
         // We can't just split on the delineating `/`, since refnames can include `/`:
         // https://sourcegraph.com/github.com/git/git@454cb6bd52a4de614a3633e4f547af03d5c3b640/-/blob/refs.c#L52-67
@@ -62,6 +64,18 @@ export async function gitRemoteNameAndBranch(
             log?.appendLine(`no upstream found, using first git remote: ${remotes[0]}`)
         }
         remoteName = remotes[0]
+        if (upstreamAndBranch && upstreamAndBranch !== remoteName) {
+            try {
+                const remotePosition = upstreamAndBranch.lastIndexOf(remoteName)
+                const maybeBranch = upstreamAndBranch.slice(remoteName.length + 1, upstreamAndBranch.length)
+
+                if (remotePosition === 0 && upstreamAndBranch !== remoteName && maybeBranch) {
+                    branch = maybeBranch
+                }
+            } catch {
+                // noop. Fallback on local branch name.
+            }
+        }
     }
 
     // Throw if a remote still isn't found
